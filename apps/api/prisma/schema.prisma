@@ -1,21 +1,79 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator client {
-  provider = "prisma-client-js"
-}
+// prisma/schema.prisma
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-model Sample {
-  id        Int      @id @default(autoincrement())
-  name      String
-  code      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+generator client {
+  provider = "prisma-client-js"
+}
 
-  @@map("samples") // if you want to use snake_case format
+model Event {
+  id                 Int        @id @default(autoincrement())
+  title              String
+  start              DateTime
+  end                DateTime
+  paymentMethod      String?    // Nullable, if event is free, this could be null
+  paymentCost        Float?     // Nullable, if event is free, this could be null
+  category           String
+  description        String
+  image              String?
+  views              Int        @default(0)
+  visitorsThisMonth  Int        @default(0)
+  visitorsLastMonth  Int        @default(0)
+  visitorsThisWeek   Int        @default(0)
+  visitorsLastWeek   Int        @default(0)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  payments           Payment[]  // One-to-many relation with Payment
+  reviews            Review[]   // One-to-many relation with Review
+}
+
+model Payment {
+  id                 Int        @id @default(autoincrement())
+  eventId            Int
+  event              Event      @relation(fields: [eventId], references: [id])
+  amount             Float
+  method             String
+  status             String
+  voucherApplied     Boolean    @default(false)  // Indicates whether a voucher was applied
+  discountAmount     Float      @default(0.0)    // Discount amount with voucher
+  createdAt          DateTime   @default(now())
+
+  paymentHistory     PaymentHistory[]  // One-to-many relation with PaymentHistory
+}  
+
+model PaymentHistory {
+  id                 Int        @id @default(autoincrement())
+  paymentId          Int
+  payment            Payment    @relation(fields: [paymentId], references: [id])
+  status             String
+  changedAt          DateTime   @default(now())  // Time of status change
+}
+
+model Review {
+  id                 Int        @id @default(autoincrement())
+  eventId            Int
+  event              Event      @relation(fields: [eventId], references: [id])
+  userId             Int
+  user               User       @relation(fields: [userId], references: [id])
+  rating             Int
+  description        String
+  createdAt          DateTime   @default(now())
+}
+
+model User {
+  id                 Int        @id @default(autoincrement())
+  email              String     @unique
+  password           String
+  referralCode       String?
+  referredBy         Int?
+  points             Int        @default(0)
+  role               String
+  isDeleted          Boolean    @default(false)
+  createdAt          DateTime   @default(now())
+  
+  reviews            Review[]   // One-to-many relation with Review
 }

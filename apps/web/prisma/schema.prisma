@@ -1,0 +1,214 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Seat {
+  id             Int      @id @default(autoincrement())
+  eventId        Int
+  totalSeats     Int
+  availableSeats Int
+  createdAt      DateTime @default(now())
+  Event          Event    @relation(fields: [eventId], references: [id])
+
+  @@unique([id])
+}
+
+model User {
+  id               Int       @id @default(autoincrement())
+  identificationId Int       @unique
+  email            String    @unique
+  password         String
+  referralCode     String?
+  refferedBy       Int?
+  points           Int
+  role             String
+  isDeleted        Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  User             User?     @relation("UserReferredBy", fields: [refferedBy], references: [id])
+  referredUsers    User[]    @relation("UserReferredBy")
+
+  @@unique([id])
+}
+
+model Event {
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  categoryId    Int
+  title         String
+  description   String
+  price         Int
+  locationId    Int
+  startTime     DateTime
+  endTime       DateTime
+  createdAt     DateTime  @default(now())
+  ticketType    String
+  isDeleted     Boolean
+  User          User      @relation(fields: [userId], references: [id])
+  Category      Category  @relation(fields: [categoryId], references: [id])
+  Location      Location  @relation(fields: [locationId], references: [id])
+  Seat          Seat[]
+  Ticket        Ticket[]
+  Testimonial   Testimonial[]
+  EventInterest EventInterest[]
+  EventStatistic EventStatistic?
+  LabelEvent    LabelEvent[]
+  Filter        Filter[]
+  HistoryUser   HistoryUser[]
+
+  @@unique([id])
+}
+
+model Testimonial {
+  id               Int       @id @default(autoincrement())
+  userId           Int
+  eventId          Int
+  reviewDescription String
+  rating           Int
+  createdAt        DateTime  @default(now())
+  User             User      @relation(fields: [userId], references: [id])
+  Event            Event     @relation(fields: [eventId], references: [id])
+
+  @@unique([id])
+}
+
+model Category {
+  id           Int       @id @default(autoincrement())
+  categoryName String
+  Event        Event[]
+
+  @@unique([id])
+}
+
+model UserInterest {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  categoryId Int
+  User       User      @relation(fields: [userId], references: [id])
+  Category   Category  @relation(fields: [categoryId], references: [id])
+  EventInterest EventInterest[]
+
+  @@unique([id])
+}
+
+model EventStatistic {
+  id               Int       @id @default(autoincrement())
+  eventId          Int
+  totalAttendance  Int
+  totalTicketsSold Int
+  totalRevenue     Int
+  createdAt        DateTime  @default(now())
+  Event            Event     @relation(fields: [eventId], references: [id])
+
+  @@unique([id])
+}
+
+model Location {
+  id           Int       @id @default(autoincrement())
+  locationName String
+  Event        Event[]
+  UserProfile  UserProfile[]
+
+  @@unique([id])
+}
+
+model Ticket {
+  id              Int       @id @default(autoincrement())
+  eventId         Int
+  userId          Int
+  qty             Int
+  total           Int
+  transactionDate DateTime  @default(now())
+  Event           Event     @relation(fields: [eventId], references: [id])
+  User            User      @relation(fields: [userId], references: [id])
+
+  @@unique([id])
+}
+
+model EventInterest {
+  id            Int          @id @default(autoincrement())
+  userInterestId Int
+  eventId       Int
+  UserInterest  UserInterest @relation(fields: [userInterestId], references: [id])
+  Event         Event        @relation(fields: [eventId], references: [id])
+
+  @@unique([id])
+}
+
+model DiscountCode {
+  id         Int      @id @default(autoincrement())
+  code       String
+  amount     Int
+  validFrom  DateTime
+  validTo    DateTime
+  limit      Int
+  createdAt  DateTime @default(now())
+  DiscountUsage DiscountUsage[]
+
+  @@unique([id])
+}
+
+model DiscountUsage {
+  id         Int        @id @default(autoincrement())
+  userId     Int
+  discountId Int
+  usedAt     DateTime   @default(now())
+  User       User       @relation(fields: [userId], references: [id])
+  DiscountCode DiscountCode @relation(fields: [discountId], references: [id])
+
+  @@unique([id])
+}
+
+model UserProfile {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  fullName     String
+  dateOfBirth  Int?
+  address      String
+  locationId   Int
+  User         User      @relation(fields: [userId], references: [id])
+  Location     Location  @relation(fields: [locationId], references: [id])
+
+  @@unique([id])
+}
+
+model Label {
+  id        Int         @id @default(autoincrement())
+  labelName String
+  LabelEvent LabelEvent[]
+
+  @@unique([id])
+}
+
+model LabelEvent {
+  id       Int     @id @default(autoincrement())
+  labelId  Int
+  eventId  Int
+  Label    Label   @relation(fields: [labelId], references: [id])
+  Event    Event   @relation(fields: [eventId], references: [id])
+
+  @@unique([id])
+}
+
+model Filter {
+  id         Int     @id @default(autoincrement())
+  eventId    Int
+  searchName String
+  Event      Event   @relation(fields: [eventId], references: [id])
+
+  @@unique([id])
+}
+
+model HistoryUser {
+  id      Int     @id @default(autoincrement())
+  eventId Int
+  userId  Int
+  Event   Event   @relation(fields: [eventId], references: [id])
+  User    User    @relation(fields: [userId], references: [id])
+
+  @@unique([id])
+}
