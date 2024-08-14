@@ -1,63 +1,13 @@
-import { EventController } from '@/controllers/event.controller';
-import { uploader } from '@/middleware/uploader';
-import { verifyToken } from '@/middleware/verifyToken';
-import { Router } from 'express';
+import express from 'express';
+import { createEvent, getEvent, gettingEvents, updateEvent, deleteEvent, getEventByTitle } from '@/controllers/event.controller';
 
-export class EventRouter {
-  private router: Router;
-  private eventController: EventController;
+const router = express.Router();
 
-  constructor() {
-    this.router = Router();
-    this.eventController = new EventController();
-    this.initializeRoutes();
-  }
+// Routes for events
+router.post('/', createEvent);
+router.get('/', getEvent); // Handles search by title
+router.get('/:title', getEventByTitle); // Fetch by title
+router.put('/:id', updateEvent);
+router.delete('/:id', deleteEvent);
 
-  private initializeRoutes(): void {
-    //Used bind to ensure that "this" inside getEvent, addEvent, and updateEvent points to the EventController instance.
-    //When you pass a method as a callback, "this" value may get lost.
-    //Using .bind(this.eventController) ensures that the method retains the correct this context when it's called by Express.
-    this.router.get(
-      '/get-event',
-      verifyToken,
-      this.eventController.getEvent.bind(this.eventController),
-    );
-    this.router.post(
-      '/add-event',
-      verifyToken,
-      uploader('/product', 'EVE').array('eve', 3),
-      this.eventController.addEvent.bind(this.eventController),
-    );
-    this.router.patch(
-      '/update-event/:eventId',
-      verifyToken,
-      uploader('/product', 'EVE').array('eve', 3),
-      this.eventController.updateEvent.bind(this.eventController),
-    );
-
-    this.router.patch(
-      '/inactive-event/:eventId',
-      verifyToken,
-      this.eventController.inactiveEvent,
-    );
-    this.router.patch(
-      '/activate-event/:eventId',
-      verifyToken,
-      this.eventController.activateEvent,
-    );
-    this.router.get(
-      '/list-events',
-      this.eventController.listEvents.bind(this.eventController),
-    );
-
-    // this.router.delete(
-    //   '/delete-event',
-    //   verifyToken,
-    //   this.eventController.deleteEvent,
-    // );
-  }
-
-  getRouter(): Router {
-    return this.router;
-  }
-}
+export default router;
