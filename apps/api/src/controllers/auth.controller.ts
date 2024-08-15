@@ -1,11 +1,13 @@
-import prisma from '@/prisma';
-import { hashPassword } from '@/utils/hash';
-import { createToken } from '@/utils/jwt';
-import { generateRandomId } from '@/utils/randomGenerator';
-import { Prisma } from '@prisma/client';
+import prisma from '../prisma';
+import { sendEmail } from '../utils/emailResetPass';
+import { hashPassword } from '../utils/hash';
+import { createToken } from '../utils/jwt';
+import { generateRandomId } from '../utils/randomGenerator';
+import { Prisma } from '../../../../node_modules/.prisma/client';
 import { compareSync } from 'bcrypt';
+import { error } from 'console';
 import { NextFunction, Request, Response } from 'express';
-import { nanoid } from 'nanoid';
+import { v4 as uuidv4 } from 'uuid';
 
 export class AuthController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -25,7 +27,7 @@ export class AuthController {
         });
       }
 
-      const referralCode = nanoid(8);
+      const referralCode = uuidv4().substring(0, 8);
       const identificationId = generateRandomId();
 
       if (refCode) {
@@ -65,6 +67,7 @@ export class AuthController {
             amount: new Prisma.Decimal(0.1),
             validFrom: new Date().toISOString(),
             validTo: validTo,
+            codeStatus: 'AVAILABLE',
             limit: 1,
           },
         });
@@ -124,6 +127,8 @@ export class AuthController {
         });
       }
     } catch (error) {
+      console.log(error);
+
       next({
         success: false,
         message: 'Failed to register',
@@ -145,10 +150,11 @@ export class AuthController {
         const comparePassword = compareSync(password, findUser.password);
 
         if (!comparePassword) {
-          throw {
-            rc: 401,
+          return res.status(401).send({
+            success: false,
             message: 'Wrong password inserted',
-          };
+            error,
+          });
         }
         const token = createToken(
           { id: findUser.id, email: findUser.email },
@@ -158,7 +164,10 @@ export class AuthController {
         return res.status(200).send({
           success: true,
           result: {
+            role: findUser.role,
+            identificationId: findUser.identificationId,
             email: findUser.email,
+            points: findUser.points,
             token: token,
           },
         });
@@ -181,11 +190,19 @@ export class AuthController {
         },
       });
 
+      const findProfile = await prisma.userprofile.findFirst({
+        where: { userId: res.locals.decrypt.id },
+      });
+
       if (findUser) {
         return res.status(200).send({
           success: true,
           result: {
             email: findUser.email,
+            identificationId: findUser.identificationId,
+            role: findUser.role,
+            points: findUser.points,
+            image: findProfile?.image,
             token: createToken(
               {
                 id: findUser.id,
@@ -216,25 +233,36 @@ export class AuthController {
 
       const findUser = await prisma.user.findUnique({
         where: {
-          email: email,
+          email,
         },
       });
 
       if (!findUser) {
-        throw {
-          rc: 404,
-          message: 'Account not found',
-        };
-      }
+        return res.status(404).send({
+          success: false,
+          message: 'cannot find your account',
+        });
+      } else {
+        const token = createToken(
+          { id: findUser.id, email: findUser.email },
+          '20m',
+        );
 
-      return res.status(200).send({
-        success: true,
-        message: 'Account exist. Please reset your password',
-        result: {
-          token: createToken({ id: findUser.id, email: findUser.email }, '1h'),
-        },
-      });
+        await sendEmail(findUser.email, 'Password Reset', null, {
+          email: findUser.email,
+          token,
+        });
+        return res.status(200).send({
+          success: true,
+          message: 'Account exist. Please reset your password',
+          result: {
+            token,
+          },
+        });
+      }
     } catch (error) {
+      console.log(error);
+
       next({ success: false, message: 'Failed to reset your password', error });
     }
   }

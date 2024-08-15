@@ -1,4 +1,4 @@
-import prisma from '@/prisma';
+import prisma from '../prisma';
 import { EventService } from '../services/event.services';
 import { NextFunction, Request, Response } from 'express';
 
@@ -9,7 +9,7 @@ export class EventController {
   }
 
   //get event utk admin spesifik utk mendapatkan event yang dibuat saja
-  async getEvent(req: Request, res: Response, next: NextFunction) {
+  async getUserEvent(req: Request, res: Response, next: NextFunction) {
     try {
       if (!res.locals.decrypt.id) {
         return res.status(404).send({
@@ -43,6 +43,48 @@ export class EventController {
       console.log(res.locals.decrypt.id);
 
       next({ success: false, message: 'Cannot find your event', error });
+    }
+  }
+
+  async getAllEvents(req: Request, res: Response, next: NextFunction) {
+    try {
+      const events = await prisma.event.findMany({
+        select: {
+          title: true,
+          description: true,
+          startTime: true,
+          endTime: true,
+          statusEvent: true,
+          price: true,
+          isDeleted: true,
+          images: {
+            select: {
+              path: true,
+            },
+          },
+          category: {
+            select: {
+              categoryName: true,
+            },
+          },
+          location: {
+            select: {
+              locationName: true,
+            },
+          },
+        },
+      });
+      return res.status(200).send({
+        success: true,
+        result: events,
+      });
+    } catch (error) {
+      console.log(error);
+      next({
+        success: false,
+        message: 'Failed to get all events',
+        error,
+      });
     }
   }
 
@@ -343,6 +385,25 @@ export class EventController {
   //ini detail event bisa utk user
   async getEventDetails(req: Request, res: Response, next: NextFunction) {
     try {
+      const { eventId } = req.params;
+
+      const findSpecificEvent = await prisma.event.findFirst({
+        where: {
+          id: Number(eventId),
+        },
+      });
+
+      if (!findSpecificEvent) {
+        return res.status(404).send({
+          success: false,
+          message: 'cannot find specific event',
+        });
+      }
+
+      return res.status(200).send({
+        success: true,
+        result: findSpecificEvent,
+      });
     } catch (error) {
       console.log(error);
       next({
@@ -356,7 +417,14 @@ export class EventController {
   //ini event list utk pagination utk user
   async listEvents(req: Request, res: Response, next: NextFunction) {
     try {
-      const { page = 1, limit = 10, category, location, dateRange } = req.query;
+      const {
+        page = 1,
+        limit = 10,
+        category,
+        location,
+        dateRange,
+        search,
+      } = req.query;
 
       //utk mengecek dateRange di query tulisnya 2024-01-01,2024-04-20
       let startTimeCondition;
@@ -367,8 +435,26 @@ export class EventController {
           lte: endDate,
         };
       }
+
+      let searchRes = {};
+
+      if (search) {
+        searchRes = {
+          OR: [
+            { title: { contains: String(search), mode: 'insensitive' } },
+            { description: { contains: String(search), mode: 'insensitive' } },
+          ],
+          // The OR keyword in Prisma is used to create a condition where one or more of the sub-conditions must be true.
+          // search either in the event's title or description.
+          // contains is a Prisma filter that checks if a string includes the specified value.
+          // String(search) ensures that the search term is treated as a string.
+          // mode: 'insensitive' makes the search case-insensitive, it won't differentiate uppercase and lowercase.
+        };
+      }
+
       const getEventsLists = await prisma.event.findMany({
         where: {
+          ...searchRes,
           category: category ? { categoryName: String(category) } : undefined,
           location: location ? { locationName: String(location) } : undefined,
           startTime: startTimeCondition,
@@ -388,6 +474,7 @@ export class EventController {
       const totalEvents = await prisma.event.count({
         // prisma.event.count  method to count the number of records in a model that match a given filter.
         where: {
+          ...searchRes,
           category: category ? { categoryName: String(category) } : undefined,
           location: location ? { locationName: String(location) } : undefined,
           startTime: startTimeCondition,
@@ -415,6 +502,86 @@ export class EventController {
   }
 
   async getAnalytic(req: Request, res: Response, next: NextFunction) {}
+
+  async addTestimonial(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { eventId } = req.params;
+      const { reviewDescription, rating } = req.body;
+
+      const findEvent = await prisma.event.findFirst({
+        where: {
+          id: Number(eventId),
+        },
+      });
+
+      if (!findEvent) {
+        return res.status(404).send({
+          success: false,
+          message: 'Cannot find your event',
+        });
+      }
+
+      const currentTime = new Date();
+      if (currentTime < findEvent.startTime) {
+        return res.status(400).send({
+          success: false,
+          message: 'The event is not started or ended yet',
+        });
+      }
+
+      const findTransaction = await prisma.ticket.findFirst({
+        where: {
+          eventId: Number(eventId),
+          userId: res.locals.decrypt.id,
+          status: 'PAID',
+        },
+      });
+
+      if (!findTransaction) {
+        return res.status(403).send({
+          success: false,
+          message:
+            'You can only leave a testimonial if you have purchased a ticket',
+        });
+      }
+
+      const existTesti = await prisma.testimonial.findFirst({
+        where: {
+          eventId: Number(eventId),
+          userId: res.locals.decrypt.id,
+        },
+      });
+
+      if (existTesti) {
+        return res.status(400).send({
+          success: false,
+          message: 'You have already left a testimonial',
+        });
+      }
+
+      const createTesti = await prisma.testimonial.create({
+        data: {
+          userId: res.locals.decrypt.id,
+          eventId: Number(eventId),
+          reviewDescription,
+          rating,
+        },
+      });
+
+      return res.status(200).send({
+        success: true,
+        result: createTesti,
+        message: 'Add testimonial success',
+      });
+    } catch (error) {
+      console.log(error);
+      next({
+        success: false,
+        message: 'cannot add testimonial',
+        error,
+      });
+    }
+  }
 
   // async deleteEvent(req: Request, res: Response, next: NextFunction) {
   //   try {

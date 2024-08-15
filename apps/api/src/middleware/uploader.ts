@@ -4,6 +4,7 @@ import { Request } from 'express';
 
 export const uploader = (dirName: string | null, prefixName?: string) => {
   const mainDir = path.join(__dirname, '../../public');
+  // const mainDir = path.join(__dirname, '../../../web/public');
 
   const configFileStore = multer.diskStorage({
     destination: (
@@ -24,5 +25,8 @@ export const uploader = (dirName: string | null, prefixName?: string) => {
       callback(null, `${prefixName || 'MEDIA'}${Date.now()}.${extension}`);
     },
   });
-  return multer({ storage: configFileStore });
+  return multer({
+    storage: configFileStore,
+    limits: { fileSize: 1 * 1024 * 1024 },
+  });
 };

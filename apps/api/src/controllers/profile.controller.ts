@@ -1,4 +1,4 @@
-import prisma from '@/prisma';
+import prisma from '../prisma';
 import { NextFunction, Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
@@ -6,14 +6,18 @@ import path from 'path';
 export class ProfileController {
   async getProfileUser(req: Request, res: Response, next: NextFunction) {
     try {
+      console.log(res.locals.decrypt.id);
+
       if (res.locals.decrypt.id) {
-        const findUser = await prisma.userprofile.findUnique({
+        const findUser = await prisma.userprofile.findFirst({
           where: {
-            id: res.locals.decrypt.id,
+            userId: res.locals.decrypt.id,
           },
         });
 
         if (!findUser) {
+          console.log('USER:', findUser);
+
           return res.status(404).send({
             success: false,
             message: 'User not found',
@@ -23,27 +27,43 @@ export class ProfileController {
       const profile = await prisma.userprofile.findMany({
         where: { userId: res.locals.decrypt.id },
         select: {
-          fullName: true,
+          firstName: true,
+          lastName: true,
+          gender: true,
           address: true,
+          phoneNumber: true,
           dateOfBirth: true,
+          isAdded: true,
           location: {
             select: {
               locationName: true,
             },
           },
+          image: true,
         },
       });
+
       return res.status(200).send({
         success: true,
         result: profile,
       });
     } catch (error) {
+      console.log(error);
+
       next({ success: false, message: 'Failed to get your information' });
     }
   }
   async addProfileUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const { address, dateOfBirth, fullName, location } = req.body;
+      const {
+        address,
+        dateOfBirth,
+        firstName,
+        lastName,
+        gender,
+        location,
+        phoneNumber,
+      } = req.body;
 
       console.log(res.locals.decrypt);
 
@@ -72,7 +92,11 @@ export class ProfileController {
               userId: findUser.id,
               address,
               dateOfBirth: new Date(dateOfBirth).toISOString(),
-              fullName,
+              firstName,
+              lastName,
+              gender,
+              phoneNumber,
+              isAdded: true,
               image: `/assets/profile/${req.file?.filename}`,
               locationId: findLocation?.id,
             },
@@ -95,7 +119,12 @@ export class ProfileController {
               userId: findUser.id,
               address: address,
               dateOfBirth: new Date(dateOfBirth).toISOString(),
-              fullName: fullName,
+              firstName,
+              lastName,
+              phoneNumber,
+              gender,
+              image: `/assets/profile/${req.file?.filename}`,
+              isAdded: true,
               locationId: createLocation.id,
             },
           });
@@ -114,6 +143,8 @@ export class ProfileController {
         });
       }
     } catch (error) {
+      console.log(error);
+
       return res.status(500).send({
         success: false,
         message: error,
@@ -123,7 +154,14 @@ export class ProfileController {
   async updateProfileUser(req: Request, res: Response, next: NextFunction) {
     try {
       if (res.locals.decrypt.id) {
-        const { address, fullName, dateOfBirth } = req.body;
+        const {
+          address,
+          firstName,
+          lastName,
+          gender,
+          dateOfBirth,
+          phoneNumber,
+        } = req.body;
 
         const findUser = await prisma.userprofile.findFirst({
           where: {
@@ -145,7 +183,10 @@ export class ProfileController {
         const updatedProfile = await prisma.userprofile.update({
           data: {
             address: address ? address : findUser?.address,
-            fullName: fullName ? fullName : findUser?.fullName,
+            firstName: firstName ? firstName : findUser?.firstName,
+            lastName: lastName ? lastName : findUser?.lastName,
+            gender: gender ? gender : findUser?.gender,
+            phoneNumber: phoneNumber ? phoneNumber : findUser?.phoneNumber,
             dateOfBirth: dateOfBirth
               ? new Date(dateOfBirth).toISOString()
               : findUser?.dateOfBirth,

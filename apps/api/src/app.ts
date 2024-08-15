@@ -13,9 +13,11 @@ import { PORT } from './config';
 import { AuthRouter } from './routers/auth.router';
 import { ProfileRouter } from './routers/profile.router';
 import { EventRouter } from './routers/event.router';
+import { TransactionRouter } from './routers/transaction.router';
+import path from 'path';
 
 export default class App {
-  private app: Express;
+  readonly app: Express;
 
   constructor() {
     this.app = express();
@@ -28,6 +30,7 @@ export default class App {
     this.app.use(cors());
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
+    this.app.use('/assets', express.static(path.join(__dirname, '../public')));
   }
 
   private handleError(): void {
@@ -59,14 +62,16 @@ export default class App {
     const authRouter = new AuthRouter();
     const profileRouter = new ProfileRouter();
     const eventRouter = new EventRouter();
+    const transactionRouter = new TransactionRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
     });
 
     this.app.use('/api/auth', authRouter.getRouter());
-    this.app.use('/api/profile', profileRouter.getRouter());
+    this.app.use('/api/user', profileRouter.getRouter());
     this.app.use('/api/event', eventRouter.getRouter());
+    this.app.use('/api/transaction', transactionRouter.getRoute());
     // this.app.use('/api/samples', sampleRouter.getRouter());
   }
 

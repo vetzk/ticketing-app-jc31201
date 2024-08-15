@@ -21,6 +21,7 @@ model discountcode {
   validFrom     DateTime        @db.Date
   validTo       DateTime        @db.Date
   limit         Int
+  codeStatus    code_status
   createdAt     DateTime        @default(now()) @db.Timestamp(0)
   discountusage discountusage[]
 }
@@ -184,7 +185,8 @@ model user {
   referralCode     String          @db.VarChar(255)
   referredBy       Int?
   points           Int?
-  role             role        
+  role             role  
+  balance          Int             @default(0)      
   tryCount         Int             @default(0)
   isBlocked        Boolean         @default(false)
   isDeleted        Boolean         @default(false)
@@ -219,10 +221,14 @@ model userinterest {
 model userprofile {
   id          Int       @id @unique(map: "id") @default(autoincrement())
   userId      Int
-  fullName    String?    @db.VarChar(255)
+  firstName    String?    @db.VarChar(255)
+  lastName    String?    @db.VarChar(255)
+  gender      gender?
   dateOfBirth DateTime? @db.Date
   image            String?           @db.VarChar(500)
   address     String?    @db.VarChar(255)
+  phoneNumber String?    @db.VarChar(255)
+  isAdded     Boolean?    @default(false)
   locationId  Int
   user        user      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "UserProfile_fk1")
   location    location  @relation(fields: [locationId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "UserProfile_fk5")
@@ -275,4 +281,14 @@ enum status_event{
 enum event_type{
   PAID
   FREE
+}
+
+enum code_status{
+  USED
+  AVAILABLE
+}
+
+enum gender{
+  MALE 
+  FEMALE
 }

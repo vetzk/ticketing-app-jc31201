@@ -1,20 +1,14 @@
-import { AuthController } from '@/controllers/auth.controller';
-import { forgotPassValidation } from '@/middleware/validator/forgotPassword';
-import { loginValidation } from '@/middleware/validator/login';
-import { registerValidation } from '@/middleware/validator/register';
-import { resetPassValidation } from '@/middleware/validator/resetPassword';
-import { verifyToken } from '@/middleware/verifyToken';
+import {
+  limiter,
+  resetLimiterOnSuccess,
+} from '../middleware/limiter/loginLimiter';
+import { AuthController } from '../controllers/auth.controller';
+import { forgotPassValidation } from '../middleware/validator/forgotPassword';
+import { loginValidation } from '../middleware/validator/login';
+import { registerValidation } from '../middleware/validator/register';
+import { resetPassValidation } from '../middleware/validator/resetPassword';
+import { verifyToken } from '../middleware/verifyToken';
 import { Router } from 'express';
-import rateLimit from 'express-rate-limit';
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: {
-    success: false,
-    message: 'Too many login attempts, please try again later',
-  },
-});
 
 export class AuthRouter {
   private router: Router;
@@ -31,9 +25,10 @@ export class AuthRouter {
       '/login',
       loginValidation,
       limiter,
+      resetLimiterOnSuccess,
       this.authController.login,
     );
-    this.router.post('/keeplogin', verifyToken, this.authController.keepLogin);
+    this.router.get('/keeplogin', verifyToken, this.authController.keepLogin);
     this.router.post(
       '/forgot-password',
       forgotPassValidation,

@@ -1,6 +1,6 @@
-import { ProfileController } from '@/controllers/profile.controller';
-import { uploader } from '@/middleware/uploader';
-import { verifyToken } from '@/middleware/verifyToken';
+import { ProfileController } from '../controllers/profile.controller';
+import { uploader } from '../middleware/uploader';
+import { verifyToken } from '../middleware/verifyToken';
 import { Router } from 'express';
 
 export class ProfileRouter {
@@ -14,15 +14,19 @@ export class ProfileRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.get('/get', verifyToken, this.profileController.getProfileUser);
+    this.router.get(
+      '/profile',
+      verifyToken,
+      this.profileController.getProfileUser,
+    );
     this.router.post(
-      '/add',
+      '/profile',
       verifyToken,
       uploader('/profile', 'USR').single('img'),
       this.profileController.addProfileUser,
     );
     this.router.patch(
-      '/update',
+      '/profile',
       verifyToken,
       uploader('/profile', 'USR').single('img'),
       this.profileController.updateProfileUser,

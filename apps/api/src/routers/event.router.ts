@@ -1,6 +1,6 @@
-import { EventController } from '@/controllers/event.controller';
-import { uploader } from '@/middleware/uploader';
-import { verifyToken } from '@/middleware/verifyToken';
+import { EventController } from '../controllers/event.controller';
+import { uploader } from '../middleware/uploader';
+import { verifyToken } from '../middleware/verifyToken';
 import { Router } from 'express';
 
 export class EventRouter {
@@ -18,12 +18,19 @@ export class EventRouter {
     //When you pass a method as a callback, "this" value may get lost.
     //Using .bind(this.eventController) ensures that the method retains the correct this context when it's called by Express.
     this.router.get(
-      '/get-event',
+      '/events/:eventId',
       verifyToken,
-      this.eventController.getEvent.bind(this.eventController),
+      this.eventController.getEventDetails.bind(this.eventController),
     );
+    this.router.get(
+      '/user-event',
+      verifyToken,
+      this.eventController.getUserEvent.bind(this.eventController),
+    );
+
+    this.router.get('/events', this.eventController.getAllEvents);
     this.router.post(
-      '/add-event',
+      '/event',
       verifyToken,
       uploader('/product', 'EVE').array('eve', 3),
       this.eventController.addEvent.bind(this.eventController),
@@ -48,6 +55,12 @@ export class EventRouter {
     this.router.get(
       '/list-events',
       this.eventController.listEvents.bind(this.eventController),
+    );
+
+    this.router.post(
+      '/add-testimonial/:eventId',
+      verifyToken,
+      this.eventController.addTestimonial,
     );
 
     // this.router.delete(

@@ -1,4 +1,4 @@
-import prisma from '@/prisma';
+import prisma from '../prisma';
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 
