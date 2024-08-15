@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, {
   json,
   urlencoded,
@@ -5,7 +8,6 @@ import express, {
   Request,
   Response,
   NextFunction,
-  Router,
 } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
@@ -21,6 +23,7 @@ export default class App {
 
   constructor() {
     this.app = express();
+    this.prisma = new PrismaClient();
     this.configure();
     this.routes();
     this.handleError();
@@ -34,16 +37,16 @@ export default class App {
   }
 
   private handleError(): void {
-    // not found
+    // Handle 404 errors
     this.app.use((req: Request, res: Response, next: NextFunction) => {
       if (req.path.includes('/api/')) {
-        res.status(404).send('Not found !');
+        res.status(404).send('Not found!');
       } else {
         next();
       }
     });
 
-    // error
+    // Handle 500 errors
     this.app.use(
       (err: Error, req: Request, res: Response, next: NextFunction) => {
         if (req.path.includes('/api/')) {
@@ -77,7 +80,7 @@ export default class App {
 
   public start(): void {
     this.app.listen(PORT, () => {
-      console.log(`  ➜  [API] Local:   http://localhost:${PORT}/`);
+      console.log(`  ➜  [API] Local: http://localhost:${PORT}/`);
     });
   }
 }

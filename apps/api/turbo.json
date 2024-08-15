@@ -1,6 +1,7 @@
 {
   "extends": ["//"],
-  "pipeline": {
+  "tasks": {
     "prisma": {}
   }
 }
+  
