@@ -9,7 +9,11 @@ module.exports = {
     './src/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'new-amsterdam': ['New Amsterdam', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 };

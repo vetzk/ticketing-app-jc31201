@@ -1,4 +1,4 @@
-import prisma from '@/prisma';
+import prisma from '../prisma';
 
 export class EventService {
   async findUserById(userId: number) {

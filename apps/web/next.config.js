@@ -1,16 +1,8 @@
- /** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
-      remotePatterns: [
-        {
-          protocol: 'https',
-          hostname: 'i0.wp.com',
-          port: '',
-          pathname: '/**',
-        },
-      ],
-    },
-  };
-  
-  module.exports = nextConfig;
-    
+  images: {
+    domains: ['localhost'], // Add any other domains you use for images
+  },
+};
+
+module.exports = nextConfig;

@@ -1,141 +1,159 @@
 'use client';
-import { UserContext } from '@/components/userContext';
-import apiCall from '@/helper/axiosInstance';
-import { useRouter } from 'next/navigation';
 import * as React from 'react';
-import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
-import { toast } from 'react-toastify';
-import Navbar from '@/app/control-layout/navbar';
+import { MdOutlineEmail } from 'react-icons/md';
+import { FaEye, FaEyeSlash, FaGoogle, FaFacebookF } from 'react-icons/fa';
+import { RiLockPasswordLine } from 'react-icons/ri';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useMutation } from '@tanstack/react-query';
+import apiCall from '@/helper/apiCall';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from 'next/navigation';
+import { ClipLoader } from 'react-spinners';
+import { UserContext } from '@/contexts/UserContext';
 
-interface ILoginPageProps {}
+interface ILoginProps {}
 
-const LoginPage: React.FunctionComponent<ILoginPageProps> = (props) => {
-  const router = useRouter();
-  const emailRef = React.useRef<HTMLInputElement>(null);
-  const passwordRef = React.useRef<HTMLInputElement>(null);
-  const { user, setUser } = React.useContext(UserContext);
-  const [Auth, IsAuth] = React.useState<boolean>(false);
+const Login: React.FunctionComponent<ILoginProps> = (props) => {
   const [isVisible, setIsVisible] = React.useState<boolean>(false);
+  const [email, setEmail] = React.useState<string>('');
+  const [password, setPassword] = React.useState<string>('');
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const router = useRouter();
+  const { user, setUser } = React.useContext(UserContext);
 
-  const onSubmit = async (): Promise<void> => {
-    try {
-      const { data } = await apiCall.post('/auth/login', {
-        email: emailRef.current?.value,
-        password: passwordRef.current?.value,
+  const mutation = useMutation({
+    mutationFn: async () => {
+      setIsLoading(true);
+      const { data } = await apiCall.post('/api/auth/login', {
+        email,
+        password,
       });
 
-      console.log(data);
-      // context redux globsal storage
-      // simpan token
-      toast(`Welcome ${data.result.email}`);
-      // Menyimpan token pada localstorage
-      localStorage.setItem('auth', data.result.token);
-
-      // Menyimpan data email dan noTelp pada globalstate useContext
-      setUser({ email: data.result.email, noTelp: data.result.noTelp });
-      router.push('/');
-    } catch (error: any) {
+      return data;
+    },
+    onSuccess: (data) => {
+      setIsLoading(false);
+      console.log(data.result);
+      localStorage.setItem('token', data.result.token);
+      setUser({
+        email: data.result.email,
+        identificationId: data.result.identificationId,
+        role: data.result.role,
+        points: data.result.points,
+        image: data.result.image,
+      });
+      if (data.result.role === 'ADMIN') {
+        router.replace('/');
+      } else {
+        router.replace('/landing');
+      }
+    },
+    onError: (error: any) => {
+      setIsLoading(false);
       console.log(error);
-      toast(error.response.data.error.message);
-    }
+      toast(error.response.data.message);
+      if (
+        error.response &&
+        error.response.data &&
+        Array.isArray(error.response.data.error.errors)
+      ) {
+        // Iterate over the errors array
+        error.response.data.error.errors.forEach((err: any) => {
+          console.log(err.msg);
+          toast(err.msg);
+        });
+      }
+    },
+  });
+
+  const handleLogin = () => {
+    mutation.mutate();
   };
 
   React.useEffect(() => {
-    if (user?.email) {
-      // IsAuth(true)
-      router.replace('/');
-    }
-    // setTimeOut
-    // if(Auth) {
-    //   router.replace("/")
-    // }
-  }, [user, IsAuth]);
-
-  if (!IsAuth) {
-    return <p className="textr-center text-sm"> </p>;
-  }
-
+    console.log(user); // Logs the updated user state
+  }, [user]);
   return (
-    <div>
-      <Navbar />
-      <div className="bg-slate-50 h-screen flex items-center">
-        <div
-          id="container"
-          className="w-4/12 bg-slate-100 m-auto shadow-lg rounded-md p-8"
-        >
-          <h1 className="w-full text-center font-semibold text-2xl">Login</h1>
-          <div className="h-96 flex flex-col justify-between mt-16 px-24">
-            <div>
-              <label className="block text-xl my-2"> Email </label>
-              <input
-                className="w-full p-2 rounded-md flex-1"
-                type="text"
-                ref={emailRef}
-              />
-            </div>
-            <div>
-              <label className="block text-xl my-2">Password</label>
-              <div className="relative flex items-center">
-                <input
-                  className="w-full p-2 rounded-md flex-1"
-                  type={isVisible ? 'text' : 'password'}
-                  ref={passwordRef}
-                />
-                <button
-                  className="absolute right-4"
-                  onClick={() => setIsVisible(!isVisible)}
-                >
-                  {isVisible ? (
-                    <MdVisibility size={24} />
-                  ) : (
-                    <MdVisibilityOff size={24} />
-                  )}
-                </button>
-              </div>
-            </div>
-              <label className="block text-xl my-2"> Referal Code </label>
-              <div className="relative flex items-center">
-                <input
-                  className="w-full p-2 rounded-md flex-1"
-                  type={isVisible ? 'text' : 'password'}
-                  ref={passwordRef}
-                />
-                <button
-                  className="absolute right-4"
-                  onClick={() => setIsVisible(!isVisible)}
-                >
-                  {isVisible ? (
-                    <MdVisibility size={24} />
-                  ) : (
-                    <MdVisibilityOff size={24} />
-                  )}
-                </button>
-              </div>
-            
-
-            <div className="flex gap-4">
-              <button
-                className="border border-slate-600 text-slate-600 p-3 w-full rounded-md shadow my-4"
-                onClick={() => router.push('/register')}
-              >
-                Regis
-              </button>
-              <button
-                className="bg-slate-500 text-white p-3 w-full rounded-md shadow my-4"
-                onClick={onSubmit}
-              >
-                Login
-              </button>
-            </div>
-            <div className="bg-slate-200 justify-center flex">
-              {' '}
-              Reset password {' '}
-            </div>
-          </div>
+    <div className="w-full h-auto flex justify-center items-center p-5">
+      <Image
+        layout="fill"
+        src={'/events-background-1.jpg'}
+        alt={'image'}
+        objectFit="cover"
+      />
+      <div className="w-1/4 rounded-xl shadow-2xl p-5 h-auto bg-slate-200 bg-opacity-50 flex flex-col justify-center items-center gap-5 z-10">
+        <ToastContainer />
+        <div className="w-full h-auto flex flex-col justify-center items-center gap-3 text-white">
+          <p className="font-bold text-3xl">Login Event</p>
+          <p>Please login to explore your dream event</p>
         </div>
-      </div> 
+        <div className="w-full h-auto justify-center items-center flex flex-col gap-3">
+          <button className="w-full h-auto p-3 bg-red-600 text-white rounded-xl shadow-2xl flex justify-center items-center gap-2 font-bold">
+            <FaGoogle size={20} />
+            Login with Google
+          </button>
+          <button className="w-full h-auto p-3 bg-blue-600 text-white rounded-xl shadow-2xl flex justify-center items-center gap-2 font-bold">
+            <FaFacebookF size={20} />
+            Login with Facebook
+          </button>
+        </div>
+        <div className="w-full flex items-center justify-center my-4">
+          <div className="w-full h-px bg-gray-400" />
+          <span className="px-3 text-white">or</span>
+          <div className="w-full h-px bg-gray-400" />
+        </div>
+        <div className="w-full h-auto flex relative items-center">
+          <MdOutlineEmail size={30} className="absolute left-2" />
+          <input
+            type="email"
+            className="w-full h-auto p-3 pl-14 rounded-xl shadow-2xl"
+            placeholder="Email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div className="w-full h-auto flex relative justify-center items-center">
+          <RiLockPasswordLine size={30} className="absolute left-2" />
+          <input
+            type={isVisible ? 'text' : 'password'}
+            className="w-full h-auto p-3 pl-14 rounded-xl shadow-2xl"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button onClick={() => setIsVisible(!isVisible)}>
+            {isVisible ? (
+              <FaEyeSlash size={30} className="absolute right-3 bottom-2" />
+            ) : (
+              <FaEye size={30} className="absolute right-3 bottom-2" />
+            )}
+          </button>
+        </div>
+        <div className="w-full h-auto flex justify-end items-center">
+          <p className="text-xl, text-white">
+            <Link href="/forgot-password">forgot your password ?</Link>
+          </p>
+        </div>
+        <div className="w-full h-auto justify-center items-center flex">
+          <button
+            onClick={handleLogin}
+            disabled={isLoading}
+            className="w-full h-auto p-3 bg-slate-500 rounded-xl shadow-2xl shadow-slate-400 font-bold text-white"
+          >
+            {isLoading ? <ClipLoader size={30} color="white" /> : 'LOGIN'}
+          </button>
+        </div>
+        <div className="w-full h-auto justify-center items-center flex text-white">
+          <p>
+            Don&apos;t have an account ?{' '}
+            <Link href="/register" className="underline">
+              Register Now
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default Login;

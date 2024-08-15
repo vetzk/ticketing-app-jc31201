@@ -10,13 +10,16 @@ import express, {
   NextFunction,
 } from 'express';
 import cors from 'cors';
-import { PrismaClient } from '@prisma/client';
-import eventRoutes from '@/routers/event.router';
-import { PORT } from './config'; // Assuming PORT is defined in your config
+import { PORT } from './config';
+// import { SampleRouter } from './routers/sample.router';
+import { AuthRouter } from './routers/auth.router';
+import { ProfileRouter } from './routers/profile.router';
+import { EventRouter } from './routers/event.router';
+import { TransactionRouter } from './routers/transaction.router';
+import path from 'path';
 
 export default class App {
-  private app: Express;
-  private prisma: PrismaClient;
+  readonly app: Express;
 
   constructor() {
     this.app = express();
@@ -30,18 +33,7 @@ export default class App {
     this.app.use(cors());
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
-  }
-
-  private routes(): void {
-    this.app.use('/events', eventRoutes);
-    
-    this.app.get('/api', (req: Request, res: Response) => {
-      res.send(`Hello, Purwadhika Student API!`);
-    });
-
-    // Initialize other routes if necessary
-    // Example: const sampleRouter = new SampleRouter();
-    // this.app.use('/api/samples', sampleRouter.getRouter());
+    this.app.use('/assets', express.static(path.join(__dirname, '../public')));
   }
 
   private handleError(): void {
@@ -58,8 +50,10 @@ export default class App {
     this.app.use(
       (err: Error, req: Request, res: Response, next: NextFunction) => {
         if (req.path.includes('/api/')) {
-          console.error('Error:', err.stack);
-          res.status(500).send('Internal server error!');
+          console.error('Error : ', err.stack);
+          console.log(err);
+
+          res.status(500).send('Error !');
         } else {
           next();
         }
@@ -67,6 +61,22 @@ export default class App {
     );
   }
 
+  private routes(): void {
+    const authRouter = new AuthRouter();
+    const profileRouter = new ProfileRouter();
+    const eventRouter = new EventRouter();
+    const transactionRouter = new TransactionRouter();
+
+    this.app.get('/api', (req: Request, res: Response) => {
+      res.send(`Hello, Purwadhika Student API!`);
+    });
+
+    this.app.use('/api/auth', authRouter.getRouter());
+    this.app.use('/api/user', profileRouter.getRouter());
+    this.app.use('/api/event', eventRouter.getRouter());
+    this.app.use('/api/transaction', transactionRouter.getRoute());
+    // this.app.use('/api/samples', sampleRouter.getRouter());
+  }
 
   public start(): void {
     this.app.listen(PORT, () => {
@@ -74,4 +84,3 @@ export default class App {
     });
   }
 }
-
