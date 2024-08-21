@@ -1,12 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `samples` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropTable
-DROP TABLE `samples`;
-
 -- CreateTable
 CREATE TABLE `category` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
@@ -17,13 +8,28 @@ CREATE TABLE `category` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `Promotion` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `eventId` INTEGER NOT NULL,
+    `seats` INTEGER NOT NULL,
+    `discount` DOUBLE NOT NULL,
+    `validFrom` DATETIME(3) NOT NULL,
+    `validTo` DATETIME(3) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `discountcode` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `code` VARCHAR(255) NOT NULL,
-    `amount` INTEGER NOT NULL,
-    `validFrom` DATETIME(0) NOT NULL,
-    `validTo` DATETIME(0) NOT NULL,
+    `code` INTEGER NOT NULL,
+    `amount` DECIMAL(10, 2) NOT NULL,
+    `validFrom` DATE NOT NULL,
+    `validTo` DATE NOT NULL,
     `limit` INTEGER NOT NULL,
+    `codeStatus` ENUM('USED', 'AVAILABLE') NOT NULL,
     `createdAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
 
     UNIQUE INDEX `id`(`id`),
@@ -51,13 +57,14 @@ CREATE TABLE `event` (
     `title` VARCHAR(255) NOT NULL,
     `description` TEXT NOT NULL,
     `price` INTEGER NOT NULL,
-    `image` BLOB NOT NULL,
+    `totalSeats` INTEGER NOT NULL,
     `locationId` INTEGER NOT NULL,
     `startTime` DATETIME(0) NOT NULL,
     `endTime` DATETIME(0) NOT NULL,
     `createdAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `ticketType` VARCHAR(255) NOT NULL,
+    `ticketType` ENUM('PAID', 'FREE') NOT NULL,
     `isDeleted` BOOLEAN NOT NULL,
+    `statusEvent` ENUM('AVAILABLE', 'SOLD_OUT', 'ENDED') NULL,
 
     UNIQUE INDEX `id`(`id`),
     INDEX `Event_fk1`(`userId`),
@@ -146,22 +153,6 @@ CREATE TABLE `location` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `referral` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `userId` INTEGER NOT NULL,
-    `referralById` INTEGER NULL,
-    `pointAmount` INTEGER NOT NULL,
-    `validFrom` DATETIME(0) NOT NULL,
-    `validTo` DATETIME(0) NOT NULL,
-    `createdAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-
-    UNIQUE INDEX `id`(`id`),
-    INDEX `Referral_fk1`(`userId`),
-    INDEX `Referral_fk2`(`referralById`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `seat` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `eventId` INTEGER NOT NULL,
@@ -196,6 +187,7 @@ CREATE TABLE `ticket` (
     `userId` INTEGER NOT NULL,
     `qty` INTEGER NOT NULL,
     `total` INTEGER NOT NULL,
+    `status` ENUM('PAID', 'UNPAID') NOT NULL,
     `transactionDate` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
 
     UNIQUE INDEX `id`(`id`),
@@ -207,19 +199,22 @@ CREATE TABLE `ticket` (
 -- CreateTable
 CREATE TABLE `user` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `identificationId` INTEGER NOT NULL,
+    `identificationId` VARCHAR(191) NOT NULL,
     `email` VARCHAR(255) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
     `referralCode` VARCHAR(255) NOT NULL,
-    `role` VARCHAR(255) NOT NULL,
+    `referredBy` INTEGER NULL,
+    `points` INTEGER NULL,
+    `role` ENUM('USER', 'ADMIN') NOT NULL,
+    `balance` INTEGER NOT NULL DEFAULT 0,
     `tryCount` INTEGER NOT NULL DEFAULT 0,
     `isBlocked` BOOLEAN NOT NULL DEFAULT false,
-    `image` BLOB NOT NULL,
     `isDeleted` BOOLEAN NOT NULL DEFAULT false,
     `createdAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
 
     UNIQUE INDEX `id`(`id`),
     UNIQUE INDEX `email`(`email`),
+    INDEX `User_fk5`(`referredBy`),
     PRIMARY KEY (`id`, `identificationId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -239,9 +234,14 @@ CREATE TABLE `userinterest` (
 CREATE TABLE `userprofile` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userId` INTEGER NOT NULL,
-    `fullName` VARCHAR(255) NOT NULL,
+    `firstName` VARCHAR(255) NULL,
+    `lastName` VARCHAR(255) NULL,
+    `gender` ENUM('MALE', 'FEMALE') NULL,
     `dateOfBirth` DATE NULL,
-    `address` VARCHAR(255) NOT NULL,
+    `image` VARCHAR(500) NULL,
+    `address` VARCHAR(255) NULL,
+    `phoneNumber` VARCHAR(255) NULL,
+    `isAdded` BOOLEAN NULL DEFAULT false,
     `locationId` INTEGER NOT NULL,
 
     UNIQUE INDEX `id`(`id`),
@@ -249,6 +249,41 @@ CREATE TABLE `userprofile` (
     INDEX `UserProfile_fk5`(`locationId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `point` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userId` INTEGER NOT NULL,
+    `amount` INTEGER NOT NULL,
+    `validFrom` DATETIME(0) NOT NULL,
+    `validTo` DATETIME(0) NOT NULL,
+    `createdAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+
+    UNIQUE INDEX `id`(`id`),
+    INDEX `Point_fk1`(`userId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `BlacklistToken` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `token` VARCHAR(191) NOT NULL,
+    `createdAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Image` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `path` VARCHAR(191) NOT NULL,
+    `eventId` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `Promotion` ADD CONSTRAINT `Promotion_eventId_fkey` FOREIGN KEY (`eventId`) REFERENCES `event`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `discountusage` ADD CONSTRAINT `DiscountUsage_fk1` FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -290,12 +325,6 @@ ALTER TABLE `labelevent` ADD CONSTRAINT `LabelEvent_fk1` FOREIGN KEY (`labelId`)
 ALTER TABLE `labelevent` ADD CONSTRAINT `LabelEvent_fk2` FOREIGN KEY (`eventId`) REFERENCES `event`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE `referral` ADD CONSTRAINT `Referral_fk1` FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- AddForeignKey
-ALTER TABLE `referral` ADD CONSTRAINT `Referral_fk2` FOREIGN KEY (`referralById`) REFERENCES `user`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- AddForeignKey
 ALTER TABLE `seat` ADD CONSTRAINT `Seat_fk1` FOREIGN KEY (`eventId`) REFERENCES `event`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
@@ -311,6 +340,9 @@ ALTER TABLE `ticket` ADD CONSTRAINT `Ticket_fk1` FOREIGN KEY (`eventId`) REFEREN
 ALTER TABLE `ticket` ADD CONSTRAINT `Ticket_fk2` FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
+ALTER TABLE `user` ADD CONSTRAINT `User_fk5` FOREIGN KEY (`referredBy`) REFERENCES `user`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
 ALTER TABLE `userinterest` ADD CONSTRAINT `UserInterest_fk1` FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
@@ -321,3 +353,9 @@ ALTER TABLE `userprofile` ADD CONSTRAINT `UserProfile_fk1` FOREIGN KEY (`userId`
 
 -- AddForeignKey
 ALTER TABLE `userprofile` ADD CONSTRAINT `UserProfile_fk5` FOREIGN KEY (`locationId`) REFERENCES `location`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `point` ADD CONSTRAINT `Point_fk1` FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `Image` ADD CONSTRAINT `Image_eventId_fkey` FOREIGN KEY (`eventId`) REFERENCES `event`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

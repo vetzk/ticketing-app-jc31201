@@ -8,7 +8,7 @@ import { compareSync } from 'bcrypt';
 import { error } from 'console';
 import { NextFunction, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-
+  
 export class AuthController {
   async register(req: Request, res: Response, next: NextFunction) {
     try {
@@ -64,7 +64,7 @@ export class AuthController {
         const discountID = await prisma.discountcode.create({
           data: {
             code: code,
-            amount: new Prisma.Decimal(0.1),
+            amount: 5000, 
             validFrom: new Date().toISOString(),
             validTo: validTo,
             codeStatus: 'AVAILABLE',

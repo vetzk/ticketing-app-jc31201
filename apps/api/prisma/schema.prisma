@@ -14,10 +14,22 @@ model category {
   userinterest userinterest[]
 }
 
+model Promotion {
+  id       Int       @id @default(autoincrement())
+  event    event     @relation(fields: [eventId], references: [id])
+  eventId  Int
+  seats    Int
+  discount Float
+  validFrom DateTime
+  validTo  DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model discountcode {
   id            Int             @id @unique(map: "id") @default(autoincrement())
-  code          String          @db.VarChar(255)
-  amount        Decimal         @db.Decimal(10, 2)
+  code          String         @unique  
+  amount        Int  
   validFrom     DateTime        @db.Date
   validTo       DateTime        @db.Date
   limit         Int
@@ -41,10 +53,12 @@ model discountusage {
 model event {
   id             Int              @id @unique(map: "id") @default(autoincrement())
   userId         Int
-  categoryId     Int
+  categoryId     Int 
+  promotions Promotion[] 
   title          String           @db.VarChar(255)
   description    String           @db.Text
-  price          Int
+  price          Int 
+  totalSeats     Int  
   images          Image[]         
   locationId     Int
   startTime      DateTime         @db.DateTime(0)
@@ -195,7 +209,7 @@ model user {
   event            event[]
   historyuser      historyuser[]
   point            point[]
-  testimonial      testimonial[]
+  testimonial      testimonial []
   ticket           ticket[]
   user             user?           @relation("userTouser", fields: [referredBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "User_fk5")
   other_user       user[]          @relation("userTouser")

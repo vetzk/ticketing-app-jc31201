@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Carousel } from '@/components/ui/carousel'; // Adjust the import path if needed
 import { Input } from '@/components/ui/input';
-
+  
 type Event = {
   seatsAvailable: ReactNode;
   id: number;

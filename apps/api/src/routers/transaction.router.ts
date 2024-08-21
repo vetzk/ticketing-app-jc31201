@@ -1,28 +1,25 @@
-import { TransactionController } from '../controllers/transaction.controller';
 import { Router } from 'express';
+import { TransactionController } from '@/controllers/transaction.controller'; 
 
 export class TransactionRouter {
   private router: Router;
   private transactionController: TransactionController;
 
-  constructor() {
+  public constructor() {
     this.router = Router();
     this.transactionController = new TransactionController();
     this.initializeRoutes();
   }
 
   private initializeRoutes(): void {
-    this.router.post(
-      '/add-transaction/:eventId',
-      this.transactionController.addTransaction,
-    );
-    this.router.patch(
-      '/pay-transaction/:ticketId',
-      this.transactionController.payTransaction,
-    );
+    this.router.post('/transaction', this.transactionController.createTransaction);
+    this.router.get('/transaction/:id', this.transactionController.readTransaction);
+    this.router.put('/transaction/:id', this.transactionController.updateTransaction);
+    this.router.delete('/transaction/:id', this.transactionController.deleteTransaction);
   }
 
-  getRoute(): Router {
+  public getRouter(): Router {
     return this.router;
   }
 }
+

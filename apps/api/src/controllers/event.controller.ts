@@ -55,7 +55,8 @@ export class EventController {
           startTime: true,
           endTime: true,
           statusEvent: true,
-          price: true,
+          price: true, 
+          totalSeats: true,  
           isDeleted: true,
           images: {
             select: {
@@ -96,7 +97,8 @@ export class EventController {
         title,
         description,
         category,
-        price,
+        price, 
+        totalSeats, 
         location,
         ticketType,
         startTime,
@@ -111,7 +113,8 @@ export class EventController {
         !location ||
         !ticketType ||
         !startTime ||
-        !endTime
+        !endTime || 
+        !totalSeats 
       ) {
         return res.status(401).send({
           success: false,
@@ -153,7 +156,8 @@ export class EventController {
         data: {
           title: title,
           userId: res.locals.decrypt.id,
-          description,
+          description, 
+          totalSeats, 
           images: {
             create: imagePaths.map((path: any) => ({
               path,
@@ -193,7 +197,8 @@ export class EventController {
       const {
         title,
         description,
-        category,
+        category, 
+        totalSeats, 
         price,
         location,
         ticketType,

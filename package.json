@@ -16,8 +16,9 @@
     "@types/node": "^22.2.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.48.0",
-    "husky": "^8.0.0",
+    "husky": "^8.0.3",
     "jest": "^29.7.0",
     "jest-mock": "^29.7.0",
     "lint-staged": "^15.1.0",
@@ -45,9 +46,16 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.427.0",
-    "shadcn-ui": "^0.8.0",
+    "next": "14.2.5",
+    "react-doom": "^1.0.0",
+    "shadcn-ui": "^0.2.3",
     "tailwind-merge": "^2.5.0",
     "tailwindcss": "^3.4.9",
     "tailwindcss-animate": "^1.0.7"
-  }
+  },
+  "version": "1.0.0",
+  "description": "This project uses React.js with NextJS for the frontend, Express.js for the backend, and TurboRepo for monorepo management, facilitating rapid development of a scalable web application with streamlined collaboration and efficient server-client interactions.",
+  "main": "commitlint.config.js",
+  "author": "",
+  "license": "ISC"
 }

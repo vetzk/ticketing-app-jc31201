@@ -1,4 +1,0 @@
--- AlterTable
-ALTER TABLE `event` ADD COLUMN `coinUser` INTEGER NULL,
-    ADD COLUMN `seat` INTEGER NULL,
-    ADD COLUMN `voucerCode` VARCHAR(191) NULL;

@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import express, {
-  json,
   urlencoded,
   Express,
   Request,
@@ -11,19 +10,21 @@ import express, {
 } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
-// import { SampleRouter } from './routers/sample.router';
 import { AuthRouter } from './routers/auth.router';
 import { ProfileRouter } from './routers/profile.router';
 import { EventRouter } from './routers/event.router';
 import { TransactionRouter } from './routers/transaction.router';
+import { TestimonialRouter } from './routers/testimonial.router';
+import { DiscountRouter } from './routers/discount.route';
+import { PromotionRouter } from './routers/promotion.router';
 import path from 'path';
+import { PointBalanceRouter } from './routers/point.balance';
 
 export default class App {
   readonly app: Express;
 
   constructor() {
     this.app = express();
-    this.prisma = new PrismaClient();
     this.configure();
     this.routes();
     this.handleError();
@@ -31,7 +32,6 @@ export default class App {
 
   private configure(): void {
     this.app.use(cors());
-    this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
     this.app.use('/assets', express.static(path.join(__dirname, '../public')));
   }
@@ -51,8 +51,6 @@ export default class App {
       (err: Error, req: Request, res: Response, next: NextFunction) => {
         if (req.path.includes('/api/')) {
           console.error('Error : ', err.stack);
-          console.log(err);
-
           res.status(500).send('Error !');
         } else {
           next();
@@ -66,6 +64,10 @@ export default class App {
     const profileRouter = new ProfileRouter();
     const eventRouter = new EventRouter();
     const transactionRouter = new TransactionRouter();
+    const testimonialRouter = new TestimonialRouter();
+    const discountRouter = new DiscountRouter();
+    const balancePointRouter = new PointBalanceRouter();
+    const promotionRouter = new PromotionRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -74,8 +76,11 @@ export default class App {
     this.app.use('/api/auth', authRouter.getRouter());
     this.app.use('/api/user', profileRouter.getRouter());
     this.app.use('/api/event', eventRouter.getRouter());
-    this.app.use('/api/transaction', transactionRouter.getRoute());
-    // this.app.use('/api/samples', sampleRouter.getRouter());
+    this.app.use('/api/transaction', transactionRouter.getRouter());
+    this.app.use('/api/testimonial', testimonialRouter.getRouter());
+    this.app.use('/api/discount', discountRouter.getRouter());
+    this.app.use('/api/balance-point', balancePointRouter.getRouter());
+    this.app.use('/api/promotion', promotionRouter.getRouter());
   }
 
   public start(): void {
