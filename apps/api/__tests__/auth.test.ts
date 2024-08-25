@@ -12,7 +12,7 @@ describe('Test auth user', () => {
 
   it('return success login', async () => {
     const response = await request(app).post('/api/auth/login').send({
-      email: 'a@mail.com',
+      email: 'alfred@mail.com',
       password: 'Admin1234',
     });
     expect(response.body).toHaveProperty('success', true);

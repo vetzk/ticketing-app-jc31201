@@ -16,6 +16,18 @@ import { useMutation } from '@tanstack/react-query';
 import apiCall from '@/helper/apiCall';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Loading from '@/components/Loading';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface IAdminProfileProps {}
 
@@ -30,13 +42,11 @@ const AdminProfile: React.FunctionComponent<IAdminProfileProps> = (props) => {
   const [date, setDate] = React.useState<Date | null>(new Date());
   const [isAdded, setIsAdded] = React.useState<boolean>(false);
   const [imageFile, setImageFile] = React.useState<File | null>(null);
-  const [imageUrl, setImageUrl] = React.useState<string>('/blackpink.webp');
+  const [imageUrl, setImageUrl] = React.useState<string>('/27002.jpg');
+  const [loading, setLoading] = React.useState<boolean>(true);
 
   const { user } = React.useContext(UserContext);
   const token = localStorage.getItem('token');
-  console.log(date);
-  console.log(imageFile);
-  console.log(imageUrl);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -123,8 +133,16 @@ const AdminProfile: React.FunctionComponent<IAdminProfileProps> = (props) => {
     mutation.mutate();
 
     setEmail(user?.email);
-    console.log(email);
   }, []);
+
+  React.useEffect(() => {
+    // mutation.mutate();
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+
+    // return () => clearTimeout(timer);
+  }, [loading]);
 
   const updateProfile = useMutation({
     mutationFn: async () => {
@@ -172,36 +190,39 @@ const AdminProfile: React.FunctionComponent<IAdminProfileProps> = (props) => {
     updateProfile.mutate();
   };
 
+  if (loading) {
+    return <Loading duration={2500} />;
+  }
   return (
-    <div className="flex">
+    <div className="flex flex-col lg:flex-row">
       <AdminSidebar />
-      <div className="flex-1 p-5 ml-[30rem]">
+      <div className="flex-1 p-5 lg:ml-[30rem]">
         <ToastContainer />
         <div className="w-full flex flex-col justify-center gap-5 items-start h-auto">
-          <div className="w-full ">
+          <div className="w-full">
             <p className="text-2xl">Your profile</p>
             <p className="text-slate-500">
               Real time information about your profile
             </p>
           </div>
           <div className="w-full h-0.5 bg-slate-200"></div>
-          <div className="w-full p-10 flex justify-between items-center">
+          <div className="flex flex-col lg:flex-row w-full p-5 justify-between items-center">
             <div className="w-full flex items-center">
-              <div className="w-36 h-36 rounded-full relative bg-slate-400">
+              <div className="relative w-24 h-20 lg:w-36 lg:h-36 rounded-full">
                 <Image
                   layout="fill"
-                  src={imageFile ? imageUrl : '/blackpink.webp'}
+                  src={imageFile ? imageUrl : '/27002.jpg'}
                   objectFit="cover"
                   alt="image"
-                  className="rounded-full"
+                  className="rounded-full border border-solid border-black"
                 />
               </div>
               <div className="mx-10">
-                <p className="font-bold">Avatar</p>
+                <p className="text-sm lg:text-base">Avatar</p>
                 <p>Upload image under 1MB</p>
               </div>
             </div>
-            <div className="flex gap-5">
+            <div className="flex gap-3 mt-5 lg:mt-0">
               <input
                 type="file"
                 accept="image/*"
@@ -210,13 +231,13 @@ const AdminProfile: React.FunctionComponent<IAdminProfileProps> = (props) => {
                 className="hidden"
               />
               <Button
-                className="bg-slate-400 text-xl"
+                className="bg-slate-400 text-base lg:text-xl"
                 onClick={triggerFileInput}
               >
                 Upload Picture
               </Button>
               <Button
-                className="bg-red-600 text-xl"
+                className="bg-red-600 text-base lg:text-xl"
                 onClick={handleDeleteImage}
               >
                 Delete
@@ -230,6 +251,7 @@ const AdminProfile: React.FunctionComponent<IAdminProfileProps> = (props) => {
             <div className="w-full">
               <Input
                 type="email"
+                disabled
                 placeholder={email}
                 className="border-b-slate-600 text-xl border-0 border-b-2 rounded-none focus:ring-0 focus-visible:ring-0"
               />
@@ -257,6 +279,7 @@ const AdminProfile: React.FunctionComponent<IAdminProfileProps> = (props) => {
               <Input
                 type="text"
                 placeholder={address}
+                value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 className="border-b-slate-600 text-xl border-0 border-b-2 rounded-none focus:ring-0 focus-visible:ring-0"
               />
@@ -270,6 +293,7 @@ const AdminProfile: React.FunctionComponent<IAdminProfileProps> = (props) => {
               <Input
                 type="text"
                 placeholder={firstName}
+                value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 className="border-b-slate-600 text-xl border-0 border-b-2 rounded-none focus:ring-0 focus-visible:ring-0"
               />
@@ -283,6 +307,7 @@ const AdminProfile: React.FunctionComponent<IAdminProfileProps> = (props) => {
               <Input
                 type="text"
                 placeholder={lastName}
+                value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 className="border-b-slate-600 text-xl border-0 border-b-2 rounded-none focus:ring-0 focus-visible:ring-0"
               />
@@ -296,6 +321,7 @@ const AdminProfile: React.FunctionComponent<IAdminProfileProps> = (props) => {
               <Input
                 type="text"
                 placeholder={location}
+                value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 className="border-b-slate-600 text-xl border-0 border-b-2 rounded-none focus:ring-0 focus-visible:ring-0"
               />
@@ -325,7 +351,6 @@ const AdminProfile: React.FunctionComponent<IAdminProfileProps> = (props) => {
               onValueChange={(value) => setGender(value)}
             >
               <div className="flex justify-center items-center gap-5">
-                {' '}
                 <RadioGroupItem className="border-black" value="MALE" />
                 <Label className="text-xl font-bold">Male</Label>
               </div>
@@ -335,22 +360,43 @@ const AdminProfile: React.FunctionComponent<IAdminProfileProps> = (props) => {
               </div>
             </RadioGroup>
           </div>
-          <div className="sticky bottom-0 right-0 w-full bg-slate-50 flex justify-end items-end p-3 rounded-xl">
-            {isAdded ? (
-              <Button
-                className="text-2xl h-16 rounded-2xl  bg-blue-300"
-                onClick={handleUpdate}
-              >
-                Update Information
-              </Button>
-            ) : (
-              <Button
-                className="text-2xl h-16 rounded-2xl  bg-blue-300"
-                onClick={handleProfileSubmit}
-              >
-                Save Information
-              </Button>
-            )}
+          <div className="sticky bottom-0 right-0 w-full bg-slate-50 flex justify-end items-end p-3 rounded-xl mb-16">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                {isAdded ? (
+                  <Button className="text-2xl w-full lg:w-52 lg:text-xl h-16 rounded-2xl  bg-blue-300">
+                    Update Information
+                  </Button>
+                ) : (
+                  <Button className="text-2xl w-full lg:w-52 lg:text-xl h-16 rounded-2xl  bg-blue-300">
+                    Save Information
+                  </Button>
+                )}
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-white">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-2xl">
+                    Are you sure you want to {isAdded ? 'update' : 'save'} ?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="text-xl">
+                    {isAdded
+                      ? 'this will update your profile information'
+                      : 'this will save your infromation'}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="bg-red-500">
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-slate-300"
+                    onClick={isAdded ? handleUpdate : handleProfileSubmit}
+                  >
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       </div>

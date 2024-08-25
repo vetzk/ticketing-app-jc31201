@@ -1,13 +1,13 @@
 'use client';
-import { ComponentType, useContext, useEffect, useState } from 'react';
+import { ComponentType, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { UserContext } from '@/contexts/UserContext';
 
 interface WithRoleProps {
-  requiredRole: string;
+  // Remove `requiredRole` from here since it should not be passed as a prop
 }
 
-function withRole<T extends WithRoleProps>(
+function withRole<T extends object>(
   WrappedComponent: ComponentType<T>,
   requiredRole: string,
 ) {
@@ -20,17 +20,17 @@ function withRole<T extends WithRoleProps>(
         if (!user) {
           router.replace('/login');
         } else if (user.role !== requiredRole) {
-          router.replace('/landing');
+          router.replace('/');
         }
       }
     }, [user, loading, router]);
 
     if (loading) {
-      return <div>Loading...</div>; // Show loading if context is still loading
+      return <div>Loading...</div>;
     }
 
     if (!user || user.role !== requiredRole) {
-      return <div>Redirecting...</div>; // Show redirect message if role doesn't match
+      return <div>Redirecting...</div>;
     }
 
     return <WrappedComponent {...props} />;

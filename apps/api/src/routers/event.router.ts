@@ -18,8 +18,7 @@ export class EventRouter {
     //When you pass a method as a callback, "this" value may get lost.
     //Using .bind(this.eventController) ensures that the method retains the correct this context when it's called by Express.
     this.router.get(
-      '/events/:eventId',
-      verifyToken,
+      '/events',
       this.eventController.getEventDetails.bind(this.eventController),
     );
     this.router.get(
@@ -28,22 +27,28 @@ export class EventRouter {
       this.eventController.getUserEvent.bind(this.eventController),
     );
 
-    this.router.get('/events', this.eventController.getAllEvents);
+    this.router.get(
+      '/analytics',
+      verifyToken,
+      this.eventController.getAnalytic,
+    );
+
+    this.router.get('/all-events', this.eventController.getAllEvents);
     this.router.post(
-      '/event',
+      '/events',
       verifyToken,
       uploader('/product', 'EVE').array('eve', 3),
       this.eventController.addEvent.bind(this.eventController),
     );
     this.router.patch(
-      '/update-event/:eventId',
+      '/events',
       verifyToken,
       uploader('/product', 'EVE').array('eve', 3),
       this.eventController.updateEvent.bind(this.eventController),
     );
 
     this.router.patch(
-      '/inactive-event/:eventId',
+      '/inactive-event',
       verifyToken,
       this.eventController.inactiveEvent,
     );
@@ -58,9 +63,15 @@ export class EventRouter {
     );
 
     this.router.post(
-      '/add-testimonial/:eventId',
+      '/testimonial/:eventId',
       verifyToken,
       this.eventController.addTestimonial,
+    );
+
+    this.router.get(
+      '/attendance',
+      verifyToken,
+      this.eventController.getAttendanceList,
     );
 
     // this.router.delete(

@@ -17,13 +17,14 @@ model category {
 model discountcode {
   id            Int             @id @unique(map: "id") @default(autoincrement())
   code          String          @db.VarChar(255)
-  amount        Decimal         @db.Decimal(10, 2)
+  amount        Int        
   validFrom     DateTime        @db.Date
   validTo       DateTime        @db.Date
   limit         Int
   codeStatus    code_status
   createdAt     DateTime        @default(now()) @db.Timestamp(0)
   discountusage discountusage[]
+  ticket        ticket[]
 }
 
 model discountusage {
@@ -166,15 +167,31 @@ model ticket {
   id              Int      @id @unique(map: "id") @default(autoincrement())
   eventId         Int
   userId          Int
+  discountId      Int?
+  orderCode       String  @db.VarChar(255)
   qty             Int
   total           Int
+  discountTotal   Int
   status          paid_status
   transactionDate DateTime @default(now()) @db.Timestamp(0)
+  transactionDetail TransactionDetail[]
   event           event    @relation(fields: [eventId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Ticket_fk1")
   user            user     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Ticket_fk2")
+  discountcode discountcode? @relation(fields: [discountId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Ticket_fk3")
 
   @@index([eventId], map: "Ticket_fk1")
   @@index([userId], map: "Ticket_fk2")
+  @@index([discountId], map: "Ticket_fk3")
+}
+
+model TransactionDetail {
+  id              Int      @id @unique(map: "id") @default(autoincrement())
+  ticketId        Int
+  ticketCode      String   @db.VarChar(255)
+  status          String?   @db.VarChar(255) 
+  ticket        ticket  @relation(fields:[ticketId], references:[id], onDelete: NoAction, onUpdate: NoAction, map: "TransactionDetail_fk1")
+
+  @@index([ticketId], map: "TransactionDetail_fk1")
 }
 
 model user {
