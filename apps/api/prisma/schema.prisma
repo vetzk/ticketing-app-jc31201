@@ -2,8 +2,23 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator client {
-  provider = "prisma-client-js"
+model category {
+  id           Int            @id @unique(map: "id") @default(autoincrement())
+  categoryName String         @db.VarChar(255)
+  event        event[]
+  userinterest userinterest[]
+}
+
+model Promotion {
+  id       Int       @id @default(autoincrement())
+  event    event     @relation(fields: [eventId], references: [id])
+  eventId  Int
+  seats    Int
+  discount Float
+  validFrom DateTime
+  validTo  DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 datasource db {
