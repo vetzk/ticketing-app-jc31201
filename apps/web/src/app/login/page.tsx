@@ -12,6 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/navigation';
 import { ClipLoader } from 'react-spinners';
 import { UserContext } from '@/contexts/UserContext';
+import withAuth from '@/hoc/authGuard';
 
 interface ILoginProps {}
 
@@ -35,7 +36,6 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
     },
     onSuccess: (data) => {
       setIsLoading(false);
-      console.log(data.result);
       localStorage.setItem('token', data.result.token);
       setUser({
         email: data.result.email,
@@ -44,24 +44,18 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
         points: data.result.points,
         image: data.result.image,
       });
-      if (data.result.role === 'ADMIN') {
-        router.replace('/');
-      } else {
-        router.replace('/landing');
-      }
+
+      router.replace('/');
     },
     onError: (error: any) => {
       setIsLoading(false);
-      console.log(error);
       toast(error.response.data.message);
       if (
         error.response &&
         error.response.data &&
         Array.isArray(error.response.data.error.errors)
       ) {
-        // Iterate over the errors array
         error.response.data.error.errors.forEach((err: any) => {
-          console.log(err.msg);
           toast(err.msg);
         });
       }
@@ -73,28 +67,32 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
   };
 
   React.useEffect(() => {
-    console.log(user); // Logs the updated user state
+    console.log(user);
   }, [user]);
+
   return (
-    <div className="w-full h-auto flex justify-center items-center p-5">
+    <div className="relative w-full h-screen flex justify-center items-center overflow-hidden p-10">
       <Image
-        layout="fill"
         src={'/events-background-1.jpg'}
         alt={'image'}
+        layout="fill"
         objectFit="cover"
+        className="absolute inset-0 -z-10"
       />
-      <div className="w-1/4 rounded-xl shadow-2xl p-5 h-auto bg-slate-200 bg-opacity-50 flex flex-col justify-center items-center gap-5 z-10">
+      <div className="w-full max-w-sm rounded-xl shadow-2xl p-5 h-auto bg-slate-200 bg-opacity-75 flex flex-col justify-center items-center gap-5 z-10">
         <ToastContainer />
-        <div className="w-full h-auto flex flex-col justify-center items-center gap-3 text-white">
-          <p className="font-bold text-3xl">Login Event</p>
-          <p>Please login to explore your dream event</p>
+        <div className="w-full h-auto flex flex-col justify-center items-center gap-3">
+          <p className="font-bold text-3xl text-center">Login Event</p>
+          <p className="text-center">
+            Please login to explore your dream event
+          </p>
         </div>
         <div className="w-full h-auto justify-center items-center flex flex-col gap-3">
-          <button className="w-full h-auto p-3 bg-red-600 text-white rounded-xl shadow-2xl flex justify-center items-center gap-2 font-bold">
+          <button className="w-full p-3 bg-red-600 text-white rounded-xl shadow-2xl flex justify-center items-center gap-2 font-bold">
             <FaGoogle size={20} />
             Login with Google
           </button>
-          <button className="w-full h-auto p-3 bg-blue-600 text-white rounded-xl shadow-2xl flex justify-center items-center gap-2 font-bold">
+          <button className="w-full p-3 bg-blue-600 text-white rounded-xl shadow-2xl flex justify-center items-center gap-2 font-bold">
             <FaFacebookF size={20} />
             Login with Facebook
           </button>
@@ -105,7 +103,10 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
           <div className="w-full h-px bg-gray-400" />
         </div>
         <div className="w-full h-auto flex relative items-center">
-          <MdOutlineEmail size={30} className="absolute left-2" />
+          <MdOutlineEmail
+            size={30}
+            className="absolute left-2 top-1/2 transform -translate-y-1/2"
+          />
           <input
             type="email"
             className="w-full h-auto p-3 pl-14 rounded-xl shadow-2xl"
@@ -113,39 +114,41 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
-        <div className="w-full h-auto flex relative justify-center items-center">
-          <RiLockPasswordLine size={30} className="absolute left-2" />
+        <div className="w-full h-auto flex relative items-center">
+          <RiLockPasswordLine
+            size={30}
+            className="absolute left-2 top-1/2 transform -translate-y-1/2"
+          />
           <input
             type={isVisible ? 'text' : 'password'}
             className="w-full h-auto p-3 pl-14 rounded-xl shadow-2xl"
             placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}
           />
-          <button onClick={() => setIsVisible(!isVisible)}>
-            {isVisible ? (
-              <FaEyeSlash size={30} className="absolute right-3 bottom-2" />
-            ) : (
-              <FaEye size={30} className="absolute right-3 bottom-2" />
-            )}
+          <button
+            onClick={() => setIsVisible(!isVisible)}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2"
+          >
+            {isVisible ? <FaEyeSlash size={30} /> : <FaEye size={30} />}
           </button>
         </div>
         <div className="w-full h-auto flex justify-end items-center">
-          <p className="text-xl, text-white">
-            <Link href="/forgot-password">forgot your password ?</Link>
+          <p className="text-lg">
+            <Link href="/forgot-password">forgot your password?</Link>
           </p>
         </div>
-        <div className="w-full h-auto justify-center items-center flex">
+        <div className="w-full h-auto flex justify-center items-center">
           <button
             onClick={handleLogin}
             disabled={isLoading}
-            className="w-full h-auto p-3 bg-slate-500 rounded-xl shadow-2xl shadow-slate-400 font-bold text-white"
+            className="w-full p-3 bg-slate-500 rounded-xl shadow-2xl shadow-slate-400 font-bold text-white"
           >
             {isLoading ? <ClipLoader size={30} color="white" /> : 'LOGIN'}
           </button>
         </div>
-        <div className="w-full h-auto justify-center items-center flex text-white">
+        <div className="w-full h-auto flex justify-center items-center text-white">
           <p>
-            Don&apos;t have an account ?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/register" className="underline">
               Register Now
             </Link>
@@ -156,4 +159,4 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
   );
 };
 
-export default Login;
+export default withAuth(Login);

@@ -10,18 +10,12 @@ const withAuth = (WrappedComponent: ComponentType<any>) => {
     useEffect(() => {
       console.log(user);
 
-      if (!user) {
-        router.replace('/login');
-      } else {
-        if (user.role === 'ADMIN') {
-          router.replace('/');
-        } else {
-          router.replace('/landing');
-        }
+      if (user?.role === 'ADMIN') {
+        router.replace('/admin/profile');
       }
     }, [router, user]);
 
-    if (user?.email) {
+    if (user || !user) {
       return <WrappedComponent {...props} />;
     } else {
       return null;

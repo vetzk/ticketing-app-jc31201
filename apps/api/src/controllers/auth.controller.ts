@@ -8,7 +8,7 @@ import { compareSync } from 'bcrypt';
 import { error } from 'console';
 import { NextFunction, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-  
+
 export class AuthController {
   async register(req: Request, res: Response, next: NextFunction) {
     try {
@@ -64,7 +64,7 @@ export class AuthController {
         const discountID = await prisma.discountcode.create({
           data: {
             code: code,
-            amount: 5000, 
+            amount: 10,
             validFrom: new Date().toISOString(),
             validTo: validTo,
             codeStatus: 'AVAILABLE',
@@ -89,12 +89,16 @@ export class AuthController {
           },
         });
 
-        const token = createToken({ id: user.id, email: user.email }, '24h');
+        const token = createToken(
+          { id: user.id, email: user.email, role: user.role },
+          '24h',
+        );
 
         return res.status(200).send({
           success: true,
           message: 'your account is created',
           result: {
+            role: user.role,
             email: user.email,
             token: token,
           },
@@ -111,7 +115,10 @@ export class AuthController {
           },
         });
 
-        const token = createToken({ id: user.id, email: user.email }, '24h');
+        const token = createToken(
+          { id: user.id, email: user.email, role: user.role },
+          '24h',
+        );
 
         console.log(identificationId);
 
@@ -119,6 +126,7 @@ export class AuthController {
           success: true,
           message: 'Your account is created',
           result: {
+            role: user.role,
             email: user.email,
             token: token,
             identificationId: identificationId,
@@ -157,9 +165,15 @@ export class AuthController {
           });
         }
         const token = createToken(
-          { id: findUser.id, email: findUser.email },
+          { id: findUser.id, email: findUser.email, role: findUser.role },
           '24h',
         );
+
+        const findProfile = await prisma.userprofile.findFirst({
+          where: {
+            userId: findUser.id,
+          },
+        });
 
         return res.status(200).send({
           success: true,
@@ -168,6 +182,7 @@ export class AuthController {
             identificationId: findUser.identificationId,
             email: findUser.email,
             points: findUser.points,
+            image: findProfile?.image,
             token: token,
           },
         });
@@ -207,6 +222,7 @@ export class AuthController {
               {
                 id: findUser.id,
                 email: findUser.email,
+                role: findUser.role,
               },
               '24h',
             ),

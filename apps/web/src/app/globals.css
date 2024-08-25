@@ -2,12 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
+/* @layer base {
   * {
     font-family: 'New Amsterdam';
     letter-spacing: 5px;
   }
-}
+} */
 
 @keyframes marquee {
   0% {
@@ -21,9 +21,9 @@
 .animate-marquee {
   animation: marquee 15s linear infinite;
 }
-@font-face {
+/* @font-face {
   font-family: 'New Amsterdam';
   src: url('/fonts/NewAmsterdam-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
-}
+} */

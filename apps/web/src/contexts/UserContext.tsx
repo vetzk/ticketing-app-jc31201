@@ -4,7 +4,6 @@ import { UserContextType, UserType } from './type';
 import * as React from 'react';
 import apiCall from '@/helper/apiCall';
 import { toast } from 'react-toastify';
-import { boolean } from 'yup';
 
 export const UserContext = React.createContext<UserContextType>({
   user: null,
