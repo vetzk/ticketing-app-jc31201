@@ -2,6 +2,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -82,6 +86,85 @@ model eventinterest {
   @@index([eventId], map: "EventInterest_fk2")
 }
 
+model eventstatistic {
+  id               Int      @id @unique(map: "id") @default(autoincrement())
+  eventId          Int
+  totalAttendance  Int
+  totalTicketsSold Int
+  totalRevenue     Int
+  createdAt        DateTime @default(now()) @db.Timestamp(0)
+  event            event    @relation(fields: [eventId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "EventStatistic_fk1")
+
+  @@index([eventId], map: "EventStatistic_fk1")
+}
+
+model filter {
+  id         Int    @id @unique(map: "id") @default(autoincrement())
+  eventId    Int
+  searchName String @db.VarChar(255)
+  event      event  @relation(fields: [eventId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Filter_fk1")
+
+  @@index([eventId], map: "Filter_fk1")
+}
+
+model historyuser {
+  id      Int   @id @unique(map: "id") @default(autoincrement())
+  eventId Int
+  userId  Int
+  event   event @relation(fields: [eventId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "HistoryUser_fk1")
+  user    user  @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "HistoryUser_fk2")
+
+  @@index([eventId], map: "HistoryUser_fk1")
+  @@index([userId], map: "HistoryUser_fk2")
+}
+
+model label {
+  id         Int          @id @unique(map: "id") @default(autoincrement())
+  labelName  String       @db.VarChar(255)
+  labelevent labelevent[]
+}
+
+model labelevent {
+  id      Int   @id @unique(map: "id") @default(autoincrement())
+  labelId Int
+  eventId Int
+  label   label @relation(fields: [labelId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "LabelEvent_fk1")
+  event   event @relation(fields: [eventId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "LabelEvent_fk2")
+
+  @@index([labelId], map: "LabelEvent_fk1")
+  @@index([eventId], map: "LabelEvent_fk2")
+}
+
+model location {
+  id           Int           @id @unique(map: "id") @default(autoincrement())
+  locationName String        @db.VarChar(255)
+  event        event[]
+  userprofile  userprofile[]
+}
+
+model seat {
+  id             Int      @id @unique(map: "id") @default(autoincrement())
+  eventId        Int
+  totalSeats     Int
+  availableSeats Int
+  createdAt      DateTime @default(now()) @db.Timestamp(0)
+  event          event    @relation(fields: [eventId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Seat_fk1")
+
+  @@index([eventId], map: "Seat_fk1")
+}
+
+model testimonial {
+  id                Int      @id @unique(map: "id") @default(autoincrement())
+  userId            Int
+  eventId           Int
+  reviewDescription String   @db.Text
+  rating            Int
+  createdAt         DateTime @default(now()) @db.Timestamp(0)
+  user              user     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Testimonial_fk1")
+  event             event    @relation(fields: [eventId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Testimonial_fk2")
+
+  @@index([userId], map: "Testimonial_fk1")
+  @@index([eventId], map: "Testimonial_fk2")
 model eventstatistic {
   id               Int      @id @unique(map: "id") @default(autoincrement())
   eventId          Int

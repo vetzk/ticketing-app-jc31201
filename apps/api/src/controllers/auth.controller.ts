@@ -8,7 +8,6 @@ import { compareSync } from 'bcrypt';
 import { error } from 'console';
 import { NextFunction, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { decode } from 'jsonwebtoken';
 
 export class AuthController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -175,9 +174,6 @@ export class AuthController {
             userId: findUser.id,
           },
         });
-
-        const decodedToken = decode(token);
-        console.log(decodedToken);
 
         return res.status(200).send({
           success: true,

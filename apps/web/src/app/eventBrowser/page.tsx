@@ -15,8 +15,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Pagination, PaginationPrevious, PaginationItem, PaginationNext } from '@/components/ui/pagination';
 import axios from 'axios';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Navbar from '../control-layout/navbar';
-import Footer from '../control-layout/footer';
+import Navbar from '../layout/navbar';
+import Footer from '../layout/footer';
 
 interface Event {
   start: ReactNode;

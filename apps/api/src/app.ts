@@ -73,7 +73,7 @@ export default class App {
     this.app.use('/api/auth', authRouter.getRouter());
     this.app.use('/api/user', profileRouter.getRouter());
     this.app.use('/api/admin', eventRouter.getRouter());
-    this.app.use('/api/transaction', transactionRouter.getRoute());
+    this.app.use('/api/transaction', transactionRouter.getRouter());
     this.app.use('/api/discount', voucherRouter.getRoute());
     // this.app.use('/api/samples', sampleRouter.getRouter());
   }

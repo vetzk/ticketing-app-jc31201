@@ -22,7 +22,7 @@ import {
   TableCell,
 } from '@/components/ui/table';
 import apiCall from '@/helper/axiosInstance';
-import EventForm from '@/app/dashboard/eventControl/eventFormAdmin/page';
+import EventForm from '@/app/dashboard/admin/create/page';
 
 type Event = {
   id: number | null;

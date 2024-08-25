@@ -1,18 +1,34 @@
+import { Router } from 'express';
 import { verifyToken } from '@/middleware/verifyToken';
 import { TransactionController } from '../controllers/transaction.controller';
-import { Router } from 'express';
 
 export class TransactionRouter {
   private router: Router;
   private transactionController: TransactionController;
 
-  constructor() {
+  public constructor() {
     this.router = Router();
     this.transactionController = new TransactionController();
     this.initializeRoutes();
   }
 
   private initializeRoutes(): void {
+    this.router.post(
+      '/transaction',
+      this.transactionController.createTransaction,
+    );
+    this.router.get(
+      '/transaction/:id',
+      this.transactionController.readTransaction,
+    );
+    this.router.put(
+      '/transaction/:id',
+      this.transactionController.updateTransaction,
+    );
+    this.router.delete(
+      '/transaction/:id',
+      this.transactionController.deleteTransaction,
+    );
     this.router.post(
       '/event',
       verifyToken,
@@ -41,7 +57,7 @@ export class TransactionRouter {
     );
   }
 
-  getRoute(): Router {
+  public getRouter(): Router {
     return this.router;
   }
 }
