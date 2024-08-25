@@ -17,7 +17,7 @@ interface IUserProviderProps {
   children: React.ReactNode;
 }
 
-const UserProvider: React.FunctionComponent<IUserProviderProps> = ({
+export const UserProvider: React.FunctionComponent<IUserProviderProps> = ({
   children,
 }) => {
   const [user, setUser] = React.useState<UserType | null>(null);
@@ -44,7 +44,7 @@ const UserProvider: React.FunctionComponent<IUserProviderProps> = ({
       }
     } catch (error: any) {
       console.log(error);
-      toast(error.response.data);
+      toast(error);
     } finally {
       setLoading(false);
     }
@@ -65,4 +65,4 @@ const UserProvider: React.FunctionComponent<IUserProviderProps> = ({
   );
 };
 
-export default UserProvider;
+

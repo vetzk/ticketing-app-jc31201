@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
-
-const prisma = new PrismaClient();
+import prisma from '../prisma';
 
 export class PointBalanceController {
   async updateBalance(req: Request, res: Response) {
@@ -20,7 +19,7 @@ export class PointBalanceController {
     }
   }
 
-  async getBalance(req: Request, res: Response) {
+    async getBalance(req: Request, res: Response) {
     const { userId } = req.params;
 
     try {
@@ -33,7 +32,7 @@ export class PointBalanceController {
         return res.status(404).send({ message: 'User not found.' });
       }
 
-      res.json(user);
+      res.send(user);
     } catch (error) {
       res.status(500).send({ message: 'Failed to retrieve balance and points.', error });
     }

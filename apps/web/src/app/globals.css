@@ -4,15 +4,15 @@
 
 @layer base {
   * {
-    font-family: 'New Amsterdam';
-    letter-spacing: 5px;
-  }
+    font-family: 'KalesiRoundedDemo';
+    letter-spacing: 3px; 
+      }
 }
 
 @keyframes marquee {
   0% {
     transform: translateX(100%);
-  }
+  }   
   100% {
     transform: translateX(-100%);
   }
@@ -22,8 +22,8 @@
   animation: marquee 15s linear infinite;
 }
 @font-face {
-  font-family: 'New Amsterdam';
-  src: url('/fonts/NewAmsterdam-Regular.ttf') format('truetype');
+  font-family: 'KalesiRoundedDemo';
+  src: url('/fonts/KalesiRoundedDemo.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }

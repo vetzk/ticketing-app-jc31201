@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { Navbar } from '../components/Navbar';
+import { Navbar } from './layout/navbar';
 import { Footer } from '../components/Footer';
 import QueryProvider from '../utils/provider/QueryProvider';
-import UserProvider from '@/contexts/UserContext';
+import { UserProvider }  from '@/contexts/UserContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,7 +24,7 @@ export default function RootLayout({
         <QueryProvider>
           <UserProvider>
             <Navbar />
-            <main>{children}</main>
+            <main> {children} </main>
           </UserProvider>
         </QueryProvider>
         {/* <Footer /> */}

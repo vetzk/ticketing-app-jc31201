@@ -28,7 +28,7 @@ export class EventService {
   async createCategory(catName: string) {
     return await prisma.category.create({
       data: {
-        categoryName: catName,
+        categoryName: catName, 
       },
     });
   }

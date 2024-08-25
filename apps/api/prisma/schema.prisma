@@ -9,11 +9,11 @@ datasource db {
 
 model category {
   id           Int            @id @unique(map: "id") @default(autoincrement())
-  categoryName String         @db.VarChar(255)
-  event        event[]
+  categoryName String       @db.VarChar(255)
+   event        event[]
   userinterest userinterest[]
 }
-
+ 
 model Promotion {
   id       Int       @id @default(autoincrement())
   event    event     @relation(fields: [eventId], references: [id])
@@ -84,7 +84,7 @@ model event {
   @@index([locationId], map: "Event_fk7")
 }
 
-model eventinterest {
+  model eventinterest {
   id             Int          @id @unique(map: "id") @default(autoincrement())
   userInterestId Int
   eventId        Int
@@ -198,9 +198,9 @@ model user {
   password         String          @db.VarChar(255)
   referralCode     String          @db.VarChar(255)
   referredBy       Int?
-  points           Int?
+  points           Int?          @default(0)  
   role             role  
-  balance          Int             @default(0)      
+  balance          Int      
   tryCount         Int             @default(0)
   isBlocked        Boolean         @default(false)
   isDeleted        Boolean         @default(false)
@@ -208,8 +208,8 @@ model user {
   discountusage    discountusage[]
   event            event[]
   historyuser      historyuser[]
-  point            point[]
-  testimonial      testimonial []
+  point            point[] 
+    testimonial      testimonial []
   ticket           ticket[]
   user             user?           @relation("userTouser", fields: [referredBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "User_fk5")
   other_user       user[]          @relation("userTouser")
@@ -305,4 +305,5 @@ enum code_status{
 enum gender{
   MALE 
   FEMALE
-}
+} 
+

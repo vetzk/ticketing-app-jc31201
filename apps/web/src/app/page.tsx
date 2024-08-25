@@ -8,8 +8,12 @@ import { UserContext } from '@/contexts/UserContext';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import apiCall from '@/helper/apiCall';
-import EventList from '@/components/EventList';
+import EventList from './eventCheck/page';
 import { Button } from '@/components/ui/button';
+import EventListCategory from './dashboard/admin/page';
+import Hero from './layout/hero';
+import Footer from './layout/footer';
+import EventCard from './eventsHome/page';
 
 function Home() {
   const listImages = [
@@ -55,56 +59,15 @@ function Home() {
     mutation.mutate();
   }, []);
   return (
-    <main className="w-full h-auto p-10 flex-col flex gap-20  ">
-      <div className="w-full min-h-screen relative">
-        <Image
-          src={listImages[currentIndex].src}
-          alt={listImages[currentIndex].alt}
-          layout="fill"
-          objectFit="cover"
-          className="rounded-xl"
-        />
-        <div className="w-full absolute top-20 text-center justify-center items-center">
-          <p className="text-9xl text-white font-new-amsterdam">
-            WORLD&apos;S BIGGEST
-            <br /> EVENT TICKET WEBSITE
-          </p>
-        </div>
-        <div className="absolute left-0 top-1/2 transform -translate-y-1/2">
-          <Button variant="ghost" onClick={previousIndex}>
-            <MdNavigateBefore size={70} color="white" />
-          </Button>
-        </div>
-        <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
-          <Button variant="ghost" onClick={nextIndex}>
-            <MdNavigateNext size={70} color="white" />
-          </Button>
-        </div>
-        <div className="overflow-hidden w-full absolute bottom-10 bg-black bg-opacity-70 py-3">
-          <div className="animate-marquee whitespace-nowrap text-white text-2xl font-new-amsterdam tracking-wider">
-            Get your tickets now! Best prices available! Don&apos;t miss out on
-            the world&apos;s biggest events!
-          </div>
-        </div>
-      </div>
-      <div className="w-full h-auto">
-        <p className="text-7xl font-bold font-new-amsterdam">
-          Favorite Artists
-        </p>
-      </div>
-      <EventList />
-      <div className="w-full h-auto">
-        <p className="text-7xl font-bold font-new-amsterdam">Seat Plan</p>
-      </div>
-      <div className="w-full min-h-screen relative my-20">
-        <Image
-          src="/seat-plan2.png"
-          alt="seat-plan"
-          objectFit="cover"
-          layout="fill"
-        />
-      </div>
-    </main>
+    <div className="mt-[-56px]">
+    <div>   <Hero />  
+
+    </div> 
+      <div> 
+      <EventCard /> </div> 
+
+      <Footer />
+    </div>
   );
 }
 

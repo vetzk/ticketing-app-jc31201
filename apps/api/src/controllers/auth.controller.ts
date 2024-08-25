@@ -80,7 +80,8 @@ export class AuthController {
             identificationId: identificationId,
             referralCode: referralCode,
             referredBy: findUser?.id,
-            role: role,
+            role: role, 
+            balance: 0, 
             discountusage: {
               create: {
                 discountId: discountID.id,
@@ -106,7 +107,8 @@ export class AuthController {
             password: await hashPassword(password),
             identificationId: identificationId,
             referralCode: referralCode,
-            role: role,
+            role: role, 
+            balance: 0, 
             points: 0,
           },
         });
@@ -119,7 +121,8 @@ export class AuthController {
           success: true,
           message: 'Your account is created',
           result: {
-            email: user.email,
+            email: user.email, 
+            user: user,
             token: token,
             identificationId: identificationId,
             referralCode: referralCode,
@@ -317,4 +320,5 @@ export class AuthController {
       });
     }
   }
-}
+} 
+

@@ -1,76 +1,80 @@
-
-
-import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
-
-const prisma = new PrismaClient();
+import prisma from '../prisma';
 
 export class TestimonialController {
-  private prisma: PrismaClient;
-
-  constructor() {
-    this.prisma = new PrismaClient();
-  }
-
   async createTestimonial(req: Request, res: Response) {
     const { userId, eventId, reviewDescription, rating } = req.body;
-
+  
     try {
-      const event = await this.prisma.event.findUnique({
+      const event = await prisma.event.findUnique({
         where: { id: eventId },
       });
-
-      if (!event || event.statusEvent !== 'ENDED') {
+  
+      if (!event) {
+        return res.status(404).send({ message: 'Event not found.' });
+      }
+  
+      const currentTime = new Date().getTime();
+      const startTime = new Date(event.startTime).getTime();
+      const endTime = new Date(event.endTime).getTime();
+  
+      let statusEvent = 'Upcoming';
+      if (currentTime > startTime && currentTime < endTime) {
+        statusEvent = 'Ongoing';
+      } else if (currentTime > endTime) {
+        statusEvent = 'Ended';
+      }
+  
+      if (statusEvent !== 'Ended') {
         return res.status(400).send({ message: 'Event has not ended yet or does not exist.' });
       }
-
-      const purchasedTicket = await this.prisma.ticket.findFirst({
+  
+      const purchasedTicket = await prisma.ticket.findFirst({
         where: { userId, eventId, status: 'PAID' },
       });
-
+  
       if (!purchasedTicket) {
         return res.status(400).send({ message: 'User has not purchased this event.' });
       }
-
-      const newTestimonial = await this.prisma.testimonial.create({
+  
+      const newTestimonial = await prisma.testimonial.create({
         data: { userId, eventId, reviewDescription, rating },
       });
-
-      res.send(newTestimonial);
+  
+      res.json(newTestimonial);
     } catch (error) {
       res.status(500).send({ message: 'Failed to create testimonial.', error });
     }
   }
-
+  
   async readTestimonial(req: Request, res: Response) {
-    const { id } = req.params;
-
+    const { eventId } = req.params;
+  
     try {
-      const testimonial = await this.prisma.testimonial.findUnique({
-        where: { id: parseInt(id, 10) },
+            const testimonials = await prisma.testimonial.findMany({
+        where: { eventId: parseInt(eventId, 10) },
       });
-
-      if (!testimonial) {
-        return res.status(404).send({ message: 'Testimonial not found.' });
+  
+      if (testimonials.length === 0) {
+        return res.status(404).send({ message: 'No testimonials found for this event.' });
       }
-
-      res.send(testimonial);
+  
+      res.status(200).send(testimonials);
     } catch (error) {
-      res.status(500).send({ message: 'Failed to retrieve testimonial.', error });
+      res.status(500).send({ message: 'Failed to retrieve testimonials.', error });
     }
   }
-
-  async updateTestimonial(req: Request, res: Response) {
+    async updateTestimonial(req: Request, res: Response) {
     const { id } = req.params;
     const { reviewDescription, rating } = req.body;
 
     try {
-      const testimonial = await this.prisma.testimonial.update({
+      const testimonial = await prisma.testimonial.update({
         where: { id: parseInt(id, 10) },
         data: { reviewDescription, rating },
       });
 
-      res.send(testimonial);
+      res.status(200).send(testimonial);
     } catch (error) {
       res.status(500).send({ message: 'Failed to update testimonial.', error });
     }
@@ -80,22 +84,16 @@ export class TestimonialController {
     const { id } = req.params;
 
     try {
-      await this.prisma.testimonial.delete({
+      await prisma.testimonial.delete({
         where: { id: parseInt(id, 10) },
       });
 
-      res.send({ message: 'Testimonial deleted successfully.' });
+      res.status(200).send({ message: 'Testimonial deleted successfully.' });
     } catch (error) {
       res.status(500).send({ message: 'Failed to delete testimonial.', error });
-    }
+    } 
   }
 }
-
-
-
-
-
-
 //  example post 
 // {
 //   "userId": 1,

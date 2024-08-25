@@ -1,27 +1,20 @@
 
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
-
-const prisma = new PrismaClient();
+import prisma from '../prisma';
 
 export class DiscountController {
-  private prisma: PrismaClient;
-
-  constructor() {
-    this.prisma = new PrismaClient();
-  }
-
-  async createDiscount(req: Request, res: Response) {
+    async createDiscount(req: Request, res: Response) {
     const { code, amount, validFrom, validTo, limit, codeStatus } = req.body;
 
     try {
-      const newDiscount = await this.prisma.discountcode.create({
+      const newDiscount = await prisma.discountcode.create({
         data: { code, amount, validFrom: new Date(validFrom), validTo: new Date(validTo), limit, codeStatus },
       });
 
-      res.json(newDiscount);
+      res.send(newDiscount);
     } catch (error) {
-      res.status(500).json({ message: 'Failed to create discount code.', error });
+      res.status(500).send({ message: 'Failed to create discount code.', error });
     }
   }
 
@@ -29,17 +22,17 @@ export class DiscountController {
     const { id } = req.params;
 
     try {
-      const discount = await this.prisma.discountcode.findUnique({
+      const discount = await prisma.discountcode.findUnique({
         where: { id: parseInt(id, 10) },
       });
 
       if (!discount) {
-        return res.status(404).json({ message: 'Discount not found.' });
+        return res.status(404).send({ message: 'Discount not found.' });
       }
 
-      res.json(discount);
+      res.send(discount); 
     } catch (error) {
-      res.status(500).json({ message: 'Failed to retrieve discount code.', error });
+      res.status(500).send({ message: 'Failed to retrieve discount code.', error });
     }
   }
 
@@ -48,28 +41,28 @@ export class DiscountController {
     const { code, amount, validFrom, validTo, limit, codeStatus } = req.body;
 
     try {
-      const discount = await this.prisma.discountcode.update({
+      const discount = await prisma.discountcode.update({
         where: { id: parseInt(id, 10) },
         data: { code, amount, validFrom: new Date(validFrom), validTo: new Date(validTo), limit, codeStatus },
       });
 
-      res.json(discount);
+      res.send(discount);
     } catch (error) {
-      res.status(500).json({ message: 'Failed to update discount code.', error });
+      res.status(500).send({ message: 'Failed to update discount code.', error });
     }
-  }
+  } 
 
   async deleteDiscount(req: Request, res: Response) {
     const { id } = req.params;
 
     try {
-      await this.prisma.discountcode.delete({
+      await prisma.discountcode.delete({
         where: { id: parseInt(id, 10) },
       });
 
-      res.json({ message: 'Discount code deleted successfully.' });
+      res.send({ message: 'Discount code deleted successfully.' });
     } catch (error) {
-      res.status(500).json({ message: 'Failed to delete discount code.', error });
+      res.status(500).send({ message: 'Failed to delete discount code.', error });
     }
   }
 }

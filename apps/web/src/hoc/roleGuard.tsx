@@ -7,25 +7,27 @@ interface WithRoleProps {
   requiredRole: string;
 }
 
-function withRole<T extends WithRoleProps>(
+function withRole<T>(
   WrappedComponent: ComponentType<T>,
   requiredRole: string,
 ) {
-  const AuthenticatedRole = (props: T) => {
+  const AuthenticatedRole = (props: T & WithRoleProps) => {
     const router = useRouter();
     const { user, loading } = useContext(UserContext);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
       if (!loading) {
+        setIsLoading(false);
         if (!user) {
           router.replace('/login');
         } else if (user.role !== requiredRole) {
           router.replace('/landing');
         }
       }
-    }, [user, loading, router]);
+    }, [user, loading, router, requiredRole]);
 
-    if (loading) {
+    if (isLoading) {
       return <div>Loading...</div>; // Show loading if context is still loading
     }
 

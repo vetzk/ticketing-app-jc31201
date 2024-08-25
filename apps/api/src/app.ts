@@ -7,6 +7,7 @@ import express, {
   Request,
   Response,
   NextFunction,
+  json,
 } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
@@ -19,6 +20,7 @@ import { DiscountRouter } from './routers/discount.route';
 import { PromotionRouter } from './routers/promotion.router';
 import path from 'path';
 import { PointBalanceRouter } from './routers/point.balance';
+import { CategoryRouter } from './routers/category.router'; // Import CategoryRouter
 
 export default class App {
   readonly app: Express;
@@ -32,6 +34,7 @@ export default class App {
 
   private configure(): void {
     this.app.use(cors());
+    this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
     this.app.use('/assets', express.static(path.join(__dirname, '../public')));
   }
@@ -68,6 +71,7 @@ export default class App {
     const discountRouter = new DiscountRouter();
     const balancePointRouter = new PointBalanceRouter();
     const promotionRouter = new PromotionRouter();
+    const categoryRouter = new CategoryRouter(); // Initialize CategoryRouter
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -81,6 +85,7 @@ export default class App {
     this.app.use('/api/discount', discountRouter.getRouter());
     this.app.use('/api/balance-point', balancePointRouter.getRouter());
     this.app.use('/api/promotion', promotionRouter.getRouter());
+    this.app.use('/api/category', categoryRouter.getRouter()); // Use CategoryRouter
   }
 
   public start(): void {

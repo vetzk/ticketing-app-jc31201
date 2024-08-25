@@ -12,8 +12,8 @@ export class PointBalanceRouter {
   }
   
   private initializeRoutes(): void {
-    this.router.put('/user/:userId/balance', this.pointBalanceController.updateBalance);
-    this.router.get('/user/:userId/balance', this.pointBalanceController.getBalance);
+    this.router.put('/user/:userId/', this.pointBalanceController.updateBalance); 
+        this.router.get('/user/:userId/', this.pointBalanceController.getBalance);
   }
 
   public getRouter(): Router {

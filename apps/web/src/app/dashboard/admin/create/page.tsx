@@ -1,251 +1,197 @@
-import React, { useState, useEffect } from 'react';
+'use client';
+import React, { useState } from 'react';
 import axios from 'axios';
-import { useForm, Controller } from 'react-hook-form';
-import { useHistory } from 'react-router-dom';
-import { categories } from './api'; // Assume this API function fetches categories
+import withRole from '@/hoc/roleGuard';
 
-type FormData = {
-  title: string;
-  description: string;
-  totalSeats: number;
-  categoryId: string;
-  price: number;
-  image: FileList;
-  locationId: string;
-  ticketType: 'paid' | 'free';
-  startTime: string;
-  endTime: string;
-};
+const PostEventForm = () => {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: '',
+    price: '',
+    totalSeats: '',
+    location: '',
+    ticketType: '',
+    startTime: '',
+    endTime: '',
+  });
+  const [files, setFiles] = useState<File[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
-const PostEvent: React.FC = () => {
-  const { control, handleSubmit, register, setValue, formState: { errors } } = useForm<FormData>();
-  const [categories, setCategories] = useState<{ id: string, name: string }[]>([]);
-  const [ticketType, setTicketType] = useState<'paid' | 'free'>('free');
-  const history = useHistory();
+  type FormDataKey = keyof typeof formData;
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get('/api/category'); // Adjust API endpoint as necessary
-        setCategories(response.data);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-      }
-    };
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name as FormDataKey]: value,
+    }));
+  };
 
-    fetchCategories();
-  }, []);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFiles(Array.from(e.target.files));
+    }
+  }; 
 
-  const onSubmit = async (data: FormData) => {
-    const formData = new FormData();
-    formData.append('title', data.title);
-    formData.append('description', data.description);
-    formData.append('totalSeats', data.totalSeats.toString());
-    formData.append('categoryId', data.categoryId);
-    formData.append('price', data.price.toString());
-    formData.append('image', data.image[0]);
-    formData.append('locationId', data.locationId);
-    formData.append('ticketType', data.ticketType);
-    formData.append('startTime', data.startTime);
-    formData.append('endTime', data.endTime);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('Authentication token missing. please log in.');
+      setLoading(false);
+      return;
+    }
+
+    const formDataToSend = new FormData();
+    for (const key in formData) {
+      formDataToSend.append(key, formData[key as FormDataKey]);
+    }
+    files.forEach((file) => formDataToSend.append('eve', file));
 
     try {
-      await axios.post('/api/event', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-      history.push('/events'); // Redirect after successful post
-    } catch (error) {
-      console.error('Error posting event:', error);
+      const response = await axios.post(
+        'http://localhost:8000/api/event/event',
+        formDataToSend,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.data.success) {
+        setSuccess(true);
+        setFormData({
+          title: '',
+          description: '',
+          category: '',
+          price: '',
+          totalSeats: '',
+          location: '',
+          ticketType: '',
+          startTime: '',
+          endTime: '',
+        });
+        setFiles([]);
+      } else {
+        setError(response.data.message || 'error post event');
+      }
+    } catch (err) {
+      setError('not occurred posting the event.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-semibold mb-4">Post New Event</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Title</label>
-          <Controller
-            name="title"
-            control={control}
-            render={({ field }) => (
-              <input
-                {...field}
-                type="text"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-              />
-            )}
-            rules={{ required: 'Title is required' }}
-          />
-          {errors.title && <p className="text-red-600 text-sm">{errors.title.message}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Description</label>
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => (
-              <textarea
-                {...field}
-                rows={4}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-              />
-            )}
-            rules={{ required: 'Description is required' }}
-          />
-          {errors.description && <p className="text-red-600 text-sm">{errors.description.message}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Total Seats</label>
-          <Controller
-            name="totalSeats"
-            control={control}
-            render={({ field }) => (
-              <input
-                {...field}
-                type="number"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-              />
-            )}
-            rules={{ required: 'Total seats are required', min: 1 }}
-          />
-          {errors.totalSeats && <p className="text-red-600 text-sm">{errors.totalSeats.message}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Category</label>
-          <Controller
-            name="categoryId"
-            control={control}
-            render={({ field }) => (
-              <select {...field} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">Select a category</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            )}
-            rules={{ required: 'Category is required' }}
-          />
-          {errors.categoryId && <p className="text-red-600 text-sm">{errors.categoryId.message}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Ticket Type</label>
-          <div className="flex space-x-4">
-            <label>
-              <input
-                type="radio"
-                value="paid"
-                checked={ticketType === 'paid'}
-                onChange={() => setTicketType('paid')}
-              />
-              Paid
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="free"
-                checked={ticketType === 'free'}
-                onChange={() => setTicketType('free')}
-              />
-              Free
-            </label>
-          </div>
-        </div>
-
-        {ticketType === 'paid' && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Price</label>
-            <Controller
-              name="price"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="number"
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                />
-              )}
-              rules={{ required: 'Price is required for paid events' }}
-            />
-            {errors.price && <p className="text-red-600 text-sm">{errors.price.message}</p>}
-          </div>
-        )}
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            {...register('image', { required: 'Image is required' })}
-            className="mt-1 block w-full"
-          />
-          {errors.image && <p className="text-red-600 text-sm">{errors.image.message}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Location ID</label>
-          <Controller
-            name="locationId"
-            control={control}
-            render={({ field }) => (
-              <input
-                {...field}
-                type="text"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-              />
-            )}
-            rules={{ required: 'Location ID is required' }}
-          />
-          {errors.locationId && <p className="text-red-600 text-sm">{errors.locationId.message}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Start Time</label>
-          <Controller
-            name="startTime"
-            control={control}
-            render={({ field }) => (
-              <input
-                {...field}
-                type="datetime-local"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-              />
-            )}
-            rules={{ required: 'Start time is required' }}
-          />
-          {errors.startTime && <p className="text-red-600 text-sm">{errors.startTime.message}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">End Time</label>
-          <Controller
-            name="endTime"
-            control={control}
-            render={({ field }) => (
-              <input
-                {...field}
-                type="datetime-local"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-              />
-            )}
-            rules={{ required: 'End time is required' }}
-          />
-          {errors.endTime && <p className="text-red-600 text-sm">{errors.endTime.message}</p>}
-        </div>
-
+    <div className="max-w-lg mx-auto p-6 bg-gray-600 backdrop-blur-sm shadow-md rounded-lg bg-opacity-60 mt-10">
+      <h2 className="text-xl font-bold text-gray-800 mb-4">Post New Event</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="title"
+          placeholder="Title"
+          value={formData.title}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded mb-4"
+          required
+        />
+        <textarea
+          name="description"
+          placeholder="Description"
+          value={formData.description}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded mb-4"
+          required
+        />
+        <input
+          type="text"
+          name="category"
+          placeholder="Category"
+          value={formData.category}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded mb-4"
+          required
+        />
+        <input
+          type="number"
+          name="price"
+          placeholder="Price"
+          value={formData.price}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded mb-4"
+          required
+        />
+        <input
+          type="number"
+          name="totalSeats"
+          placeholder="Total Seats"
+          value={formData.totalSeats}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded mb-4"
+          required
+        />
+        <input
+          type="text"
+          name="location"
+          placeholder="Location"
+          value={formData.location}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded mb-4"
+          required
+        />
+        <input
+          type="text"
+          name="ticketType"
+          placeholder="Ticket Type"
+          value={formData.ticketType}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded mb-4"
+          required
+        />
+        <input
+          type="datetime-local"
+          name="startTime"
+          value={formData.startTime}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded mb-4"
+          required
+        />
+        <input
+          type="datetime-local"
+          name="endTime"
+          value={formData.endTime}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded mb-4"
+          required
+        />
+        <input
+          type="file"
+          name="files"
+          multiple
+          onChange={handleFileChange}
+          className="w-full p-2 border rounded mb-4"
+        />
+        {loading && <p> Posting event ...</p>}
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+          className="w-full bg-blue-500 text-white p-2 rounded mt-4"
+          disabled={loading}
         >
-          Post Event
+          {loading ? 'Posting...' : 'Post Event'}
         </button>
       </form>
     </div>
   );
 };
 
-export default PostEvent;
+export default withRole(PostEventForm, 'ADMIN');

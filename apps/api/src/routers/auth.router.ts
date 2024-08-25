@@ -42,7 +42,7 @@ export class AuthRouter {
     );
     this.router.post(
       '/register',
-      registerValidation,
+      // registerValidation,
       this.authController.register,
     );
     this.router.post('/logout', this.authController.logout);

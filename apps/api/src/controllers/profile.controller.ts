@@ -52,7 +52,7 @@ export class ProfileController {
 
       next({ success: false, message: 'Failed to get your information' });
     }
-  }
+`  `  }
   async addProfileUser(req: Request, res: Response, next: NextFunction) {
     try {
       const {

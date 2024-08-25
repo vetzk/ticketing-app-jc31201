@@ -1,5 +1,9 @@
+import { ReactNode } from "react";
+
 export type UserType = {
-  email: string;
+  id: any;
+  balance: string;
+    email: string;
   role: string;
   identificationId: string;
   points: number;

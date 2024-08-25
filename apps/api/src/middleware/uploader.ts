@@ -2,31 +2,38 @@ import multer from 'multer';
 import path from 'path';
 import { Request } from 'express';
 
-export const uploader = (dirName: string | null, prefixName?: string) => {
-  const mainDir = path.join(__dirname, '../../public');
-  // const mainDir = path.join(__dirname, '../../../web/public');
+// TypeScript type for multer file
+type MulterFile = Express.Multer.File;
 
+export const uploader = (dirName: string | null, prefixName?: string) => {
+  // Base directory for file storage
+  const mainDir = path.join(__dirname, '../../public'); 
+
+  // Configure storage for multer
   const configFileStore = multer.diskStorage({
     destination: (
       req: Request,
-      file: Express.Multer.File,
+      file: MulterFile,
       callback: (error: Error | null, destination: string) => void,
     ) => {
-      const fileDest = dirName ? mainDir + dirName : mainDir;
+      // Resolve the destination directory path
+      const fileDest = dirName ? path.join(mainDir, dirName) : mainDir;
       callback(null, fileDest);
     },
     filename: (
       req: Request,
-      file: Express.Multer.File,
-      callback: (error: Error | null, destination: string) => void,
+      file: MulterFile,
+      callback: (error: Error | null, filename: string) => void,
     ) => {
-      const existName = file.originalname.split('.');
-      const extension = existName[existName.length - 1];
-      callback(null, `${prefixName || 'MEDIA'}${Date.now()}.${extension}`);
+      // Generate unique filename
+      const ext = path.extname(file.originalname);
+      const baseName = path.basename(file.originalname, ext);
+      callback(null, `${prefixName || 'MEDIA'}_${Date.now()}${ext}`);
     },
   });
+
   return multer({
     storage: configFileStore,
-    limits: { fileSize: 1 * 1024 * 1024 },
+    limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB limit
   });
 };

@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['localhost'], // Add any other domains you use for images
+    domains: ['localhost:8000/' ], 
   },
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig ; 
+  
+
