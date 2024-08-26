@@ -9,25 +9,25 @@ export class EventController {
   }
 
   // get event from admin
-  async getUserEvent(req: Request, res: Response, next: NextFunction) {
-    try {
-      if (!res.locals.decrypt.id) {
-        return res.status(404).send({
-          success: false,
-          message: 'not find token',
-        });
-      }
+  // async getUserEvent(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     if (!res.locals.decrypt.id) {
+  //       return res.status(404).send({
+  //         success: false,
+  //         message: 'not find token',
+  //       });
+  //     }
 
-      return res.status(200).send({
-        success: true,
-        massage: 'there is read event',
-      });
-    } catch (error) {
-      console.log(res.locals.decrypt.id);
-      next({ success: false, message: ' event found' });
-    }
-  }
- 
+  //     return res.status(200).send({
+  //       success: true,
+  //       massage: 'there is read event',
+  //     });
+  //   } catch (error) {
+  //     console.log(res.locals.decrypt.id);
+  //     next({ success: false, message: ' event found' });
+  //   }
+  // }
+
   // select:
   // local.dcrypt
   // Multer.File[]
@@ -78,7 +78,7 @@ export class EventController {
 
       return res.status(200).send({
         success: true,
-        message: 'Events successfully', 
+        message: 'Events successfully',
         data: events,
         pagination: {
           total: totalEvents,
@@ -96,7 +96,6 @@ export class EventController {
   }
   async getEventById(req: Request, res: Response, next: NextFunction) {
     try {
-      // Extract the event ID from the route parameter
       const eventId = parseInt(req.params.eventId);
 
       if (isNaN(eventId)) {
@@ -106,7 +105,6 @@ export class EventController {
         });
       }
 
-      // Fetch the event by its ID
       const event = await prisma.event.findUnique({
         where: {
           id: eventId,
@@ -117,7 +115,7 @@ export class EventController {
           userId: true,
           description: true,
           startTime: true,
-          endTime: true, 
+          endTime: true,
           statusEvent: true,
           price: true,
           totalSeats: true,
@@ -207,7 +205,7 @@ export class EventController {
         ? files.map((file) => `/assets/product/${file.filename}`)
         : [];
 
-      // Check or create category and location
+      // Check its create
       let categoryData = await this.eventService.findCategoryByName(category);
       let locationData = await this.eventService.findLocationByName(location);
 
@@ -222,25 +220,25 @@ export class EventController {
       // to create event
       const eventPrice = ticketType === 'PAID' ? Number(price) : 0;
 
-    // Create event
-    const newEvent = await prisma.event.create({
-      data: {
-        title,
-        description,
-        totalSeats: Number(totalSeats),
-        price: eventPrice,
-        ticketType,
-        startTime: new Date(startTime),
-        endTime: new Date(endTime),
-        userId: user.id,
-        categoryId: categoryData.id,
-        locationId: locationData.id,
-        images: { create: imagePaths.map((path) => ({ path })) },
-        isDeleted: false,
-      },
-      include: { images: true },
-    });
-    
+      // Create event list should there is
+      const newEvent = await prisma.event.create({
+        data: {
+          title,
+          description,
+          totalSeats: Number(totalSeats),
+          price: eventPrice,
+          ticketType,
+          startTime: new Date(startTime),
+          endTime: new Date(endTime),
+          userId: user.id,
+          categoryId: categoryData.id,
+          locationId: locationData.id,
+          images: { create: imagePaths.map((path) => ({ path })) },
+          isDeleted: false,
+        },
+        include: { images: true },
+      });
+
       console.log('Event created successfully', newEvent);
       return res.status(201).send({ success: true, result: newEvent });
     } catch (error) {

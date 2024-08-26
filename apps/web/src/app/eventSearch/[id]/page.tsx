@@ -39,7 +39,7 @@ const EventDetailPage: React.FC<Props> = ({ params }: Props) => {
   const [rating, setRating] = useState(1);
   const [message, setMessage] = useState('');
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [inputUserId, setInputUserId] = useState<number>(1); // Set the user ID here
+  const [inputUserId, setInputUszerId] = useState<number>(1);
   const [qty, setQty] = useState(1);
   const [discountCode, setDiscountCode] = useState('');
   const [loading, setLoading] = useState(true);
@@ -50,6 +50,7 @@ const EventDetailPage: React.FC<Props> = ({ params }: Props) => {
     const fetchEventDetails = async () => {
       setLoading(true);
       try {
+        // event
         const eventResponse = await axios.get(
           `http://localhost:8000/api/event/events/${id}`,
         );
@@ -57,6 +58,7 @@ const EventDetailPage: React.FC<Props> = ({ params }: Props) => {
         const eventData = eventResponse.data.data;
         setEvent(eventData);
 
+        // transaction
         const ticketResponse = await axios.get(
           `http://localhost:8000/api/transaction/transaction/${inputUserId}`,
         );
@@ -64,12 +66,13 @@ const EventDetailPage: React.FC<Props> = ({ params }: Props) => {
         const hasPurchased = ticketResponse.data.exists;
         setHasPurchased(hasPurchased);
 
+        // testimonial
         const testimonialResponse = await axios.get(
           `http://localhost:8000/api/testimonial/testimonial/${id}`,
         );
         setTestimonials(testimonialResponse.data);
       } catch (error) {
-        console.error('Error fetching event details or purchase status:', error);
+        console.error('Error fetching event details ', error);
       } finally {
         setLoading(false);
       }
@@ -90,11 +93,9 @@ const EventDetailPage: React.FC<Props> = ({ params }: Props) => {
         },
       );
       localStorage.setItem(`purchaseStatus_${id}_${inputUserId}`, 'true');
-      setMessage(response.data.message || 'Purchase successful!');
-      setPurchaseStatus(true);
-      setHasPurchased(true); // Update hasPurchased state
+      setMessage('Purchase successful!');
     } catch (error: any) {
-      const errorMessage = 'Error processing purchase or insufficient balance';
+      const errorMessage = 'Error processing purchase ';
       setMessage(errorMessage);
       console.error('Error purchasing event:', error);
     }
@@ -102,7 +103,7 @@ const EventDetailPage: React.FC<Props> = ({ params }: Props) => {
 
   const handleCommentSubmit = async () => {
     if (!event || new Date().getTime() <= new Date(event.endTime).getTime()) {
-      setMessage('You cannot submit a testimonial for this event.');
+      setMessage('You cannot submit a testimonial for event.');
       return;
     }
 
@@ -116,10 +117,9 @@ const EventDetailPage: React.FC<Props> = ({ params }: Props) => {
           rating,
         },
       );
-      setTestimonials([...testimonials, response.data]);
       setReviewDescription('');
       setRating(1);
-      setMessage('Testimonial submitted successfully!');
+      setMessage('Testimonial submitted successt');
     } catch (error) {
       setMessage('Error submitting testimonial.');
       console.error('Error submitting testimonial:', error);
@@ -127,13 +127,15 @@ const EventDetailPage: React.FC<Props> = ({ params }: Props) => {
   };
 
   const handleDeleteTestimonial = async (testimonialId: number) => {
-    if (window.confirm('Are you sure you want to delete this testimonial?')) {
+    if (
+      window.confirm('Are you sure delete this thinking again what happent')
+    ) {
       try {
         await axios.delete(
           `http://localhost:8000/api/testimonial/${testimonialId}`,
         );
         setTestimonials(testimonials.filter((t) => t.id !== testimonialId));
-        setMessage('Testimonial deleted successfully!');
+        setMessage(' testimonial deleted success');
       } catch (error) {
         setMessage('Error deleting testimonial.');
         console.error('Error deleting testimonial:', error);
@@ -142,7 +144,7 @@ const EventDetailPage: React.FC<Props> = ({ params }: Props) => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div> Loading ...</div>;
   }
 
   if (!event) {
@@ -172,7 +174,9 @@ const EventDetailPage: React.FC<Props> = ({ params }: Props) => {
       <p className="text-lg mt-4"> {event.endTime} </p>
       <p className="text-gray-600 mt-2">
         Location:{' '}
-        {event.location ? event.location.locationName : 'Location not available'}
+        {event.location
+          ? event.location.locationName
+          : 'Location not available'}
       </p>
       <p className="text-gray-800 mt-2">Seats Available: {event.totalSeats}</p>
       <p className="text-gray-800 mt-2">Price: {event.price}</p>
@@ -183,7 +187,7 @@ const EventDetailPage: React.FC<Props> = ({ params }: Props) => {
       >
         Status: {isEnded ? 'Ended' : isOngoing ? 'Ongoing' : 'Upcoming'}
       </p>
-      <p className="text-gray-800 mt-2">Ticket Type: {event.ticketType}</p>
+      <p className="text-gray-800 mt-2">Ticket Type : {event.ticketType}</p>
 
       {/* Purchase Form */}
       {!isEnded && !hasPurchased && (
@@ -200,7 +204,7 @@ const EventDetailPage: React.FC<Props> = ({ params }: Props) => {
             />
           </label>
           <label className="block mb-2">
-            Quantity:
+            Quantitynya:
             <input
               type="number"
               value={qty}
@@ -231,23 +235,23 @@ const EventDetailPage: React.FC<Props> = ({ params }: Props) => {
       {/* Testimonial Section */}
       {hasPurchased && isEnded && (
         <div className="mt-8">
-          <h2 className="text-2xl font-bold mb-4">Leave a Testimonial</h2>
+          <h2 className="text-2xl font-bold mb-4"> Leave a Testimonial </h2>
           <textarea
             value={reviewDescription}
             onChange={(e) => setReviewDescription(e.target.value)}
             placeholder="Write your review here..."
             className="w-full border rounded p-2 mb-2"
           />
-          <label className="block mb-2">Rating:</label>
+          <label className="block mb-2"> Rating: </label>
           <select
             value={rating}
             onChange={(e) => setRating(parseInt(e.target.value))}
             className="block mb-4 border rounded p-2"
           >
-            <option value={1}>1 - Poor</option>
-            <option value={2}>2 - Fair</option>
-            <option value={3}>3 - Good</option>
-            <option value={4}>4 - Very Good</option>
+            <option value={1}>1 - no</option>
+            <option value={2}>2 - why</option>
+            <option value={3}>3 - its ok</option>
+            <option value={4}>4 - thanks</option>
             <option value={5}>5 - Excellent</option>
           </select>
           <button

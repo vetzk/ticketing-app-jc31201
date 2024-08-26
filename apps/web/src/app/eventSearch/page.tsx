@@ -60,6 +60,7 @@ const CategoryList: React.FC = () => {
     const initialSearchTerm = searchParams.get('searchTerm') || '';
     setSearchTerm(initialSearchTerm);
   }, [searchParams]);
+ 
   // Menyiratkan bahwa efek akan dijalankan kembali setiap kali searchParams berubah.
 
   const handleCategoryClick = (categoryId: number) => {
@@ -165,14 +166,14 @@ const CategoryList: React.FC = () => {
                           {event.title}
                         </h3>
                         {event.images.length > 0 && (
-                          <Image
-                            src={event.images[0].path}
-                            alt={event.title}
-                            width={400}
-                            height={250}
-                            className="rounded-md"
-                          />
-                        )}
+                          <Image 
+                          src={`http://localhost:8000${event.images[0].path} `}
+                          alt={event.title}
+                          width={100}
+                          height={150}
+                          className="rounded-md"
+                        />
+                    )}
                         <p className="text-gray-700 mt-2">
                           {event.description}
                         </p>

@@ -18,11 +18,11 @@ export class EventRouter {
     //When you pass a method as a callback, "this" value may get lost.
     //Using .bind(this.eventController) ensures that the method retains the correct this context when it's called by Express.
     
-    this.router.get(
-      '/user-event',
-      verifyToken,
-      this.eventController.getUserEvent.bind(this.eventController), 
-    );
+    // this.router.get(
+    //   '/user-event',
+    //   verifyToken,
+    //   this.eventController.getUserEvent.bind(this.eventController), 
+    // );
     this.router.get('/events/:eventId', this.eventController.getEventById);
     this.router.get('/events/', this.eventController.getAllEvents);
     this.router.post(

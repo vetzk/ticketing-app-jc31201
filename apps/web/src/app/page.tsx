@@ -10,7 +10,6 @@ import { useMutation } from '@tanstack/react-query';
 import apiCall from '@/helper/apiCall';
 import EventList from './eventCheck/page';
 import { Button } from '@/components/ui/button';
-import EventListCategory from './dashboard/admin/page';
 import Hero from './layout/hero';
 import Footer from './layout/footer';
 import EventCard from './eventsHome/page';

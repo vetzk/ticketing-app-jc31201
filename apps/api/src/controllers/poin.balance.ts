@@ -13,13 +13,15 @@ export class PointBalanceController {
         data: { balance, points },
       });
 
-      res.send(updatedUser); 
+      res.send(updatedUser);
     } catch (error) {
-      res.status(500).send({ message: 'Failed to update balance or points.', error });
+      res
+        .status(500)
+        .send({ message: 'Failed to update balance or points.', error });
     }
   }
 
-    async getBalance(req: Request, res: Response) {
+  async getBalance(req: Request, res: Response) {
     const { userId } = req.params;
 
     try {
@@ -34,7 +36,7 @@ export class PointBalanceController {
 
       res.send(user);
     } catch (error) {
-      res.status(500).send({ message: 'Failed to retrieve balance and points.', error });
+      res.status(500).send({ message: 'Failed balance and points.', error });
     }
   }
 }

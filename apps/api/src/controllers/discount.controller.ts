@@ -1,20 +1,26 @@
-
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 import prisma from '../prisma';
 
 export class DiscountController {
-    async createDiscount(req: Request, res: Response) {
+  async createDiscount(req: Request, res: Response) {
     const { code, amount, validFrom, validTo, limit, codeStatus } = req.body;
 
     try {
       const newDiscount = await prisma.discountcode.create({
-        data: { code, amount, validFrom: new Date(validFrom), validTo: new Date(validTo), limit, codeStatus },
+        data: {
+          code,
+          amount,
+          validFrom: new Date(validFrom),
+          validTo: new Date(validTo),
+          limit,
+          codeStatus,
+        },
       });
 
       res.send(newDiscount);
     } catch (error) {
-      res.status(500).send({ message: 'Failed to create discount code.', error });
+      res.status(500).send({ message: 'Failed create discount code.', error });
     }
   }
 
@@ -30,9 +36,9 @@ export class DiscountController {
         return res.status(404).send({ message: 'Discount not found.' });
       }
 
-      res.send(discount); 
+      res.send(discount);
     } catch (error) {
-      res.status(500).send({ message: 'Failed to retrieve discount code.', error });
+      res.status(500).send({ message: 'Failed discount code.', error });
     }
   }
 
@@ -43,14 +49,21 @@ export class DiscountController {
     try {
       const discount = await prisma.discountcode.update({
         where: { id: parseInt(id, 10) },
-        data: { code, amount, validFrom: new Date(validFrom), validTo: new Date(validTo), limit, codeStatus },
+        data: {
+          code,
+          amount,
+          validFrom: new Date(validFrom),
+          validTo: new Date(validTo),
+          limit,
+          codeStatus,
+        },
       });
 
       res.send(discount);
     } catch (error) {
-      res.status(500).send({ message: 'Failed to update discount code.', error });
+      res.status(500).send({ message: 'Failed update discount code.', error });
     }
-  } 
+  }
 
   async deleteDiscount(req: Request, res: Response) {
     const { id } = req.params;
@@ -59,10 +72,12 @@ export class DiscountController {
       await prisma.discountcode.delete({
         where: { id: parseInt(id, 10) },
       });
-
+      // mencari & hapus . entri = 10  decimal di prisama
       res.send({ message: 'Discount code deleted successfully.' });
     } catch (error) {
-      res.status(500).send({ message: 'Failed to delete discount code.', error });
+      res
+        .status(500)
+        .send({ message: 'Failed to delete discount code.', error });
     }
   }
 }

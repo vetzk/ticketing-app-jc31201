@@ -167,7 +167,8 @@ export class AuthController {
         return res.status(200).send({
           success: true,
           result: {
-            role: findUser.role,
+            role: findUser.role, 
+            id: findUser.id, 
             identificationId: findUser.identificationId,
             email: findUser.email,
             points: findUser.points,

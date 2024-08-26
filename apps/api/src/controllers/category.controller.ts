@@ -58,7 +58,7 @@ export class CategoryController {
           },
         },
       });
-
+ 
             res.status(200).send(categories);
     } catch (error) {
       // Log and send error response

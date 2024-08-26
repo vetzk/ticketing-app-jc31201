@@ -26,7 +26,7 @@ export class TestimonialController {
       }
   
       if (statusEvent !== 'Ended') {
-        return res.status(400).send({ message: 'Event has not ended yet or does not exist.' });
+        return res.status(400).send({ message: 'Event has not ended does not exist.' });
       }
   
       const purchasedTicket = await prisma.ticket.findFirst({
@@ -41,7 +41,7 @@ export class TestimonialController {
         data: { userId, eventId, reviewDescription, rating },
       });
   
-      res.json(newTestimonial);
+      res.send(newTestimonial);
     } catch (error) {
       res.status(500).send({ message: 'Failed to create testimonial.', error });
     }
@@ -61,7 +61,7 @@ export class TestimonialController {
   
       res.status(200).send(testimonials);
     } catch (error) {
-      res.status(500).send({ message: 'Failed to retrieve testimonials.', error });
+      res.status(500).send({ message: 'Failed testimonials.', error });
     }
   }
     async updateTestimonial(req: Request, res: Response) {
@@ -76,7 +76,7 @@ export class TestimonialController {
 
       res.status(200).send(testimonial);
     } catch (error) {
-      res.status(500).send({ message: 'Failed to update testimonial.', error });
+      res.status(500).send({ message: 'Failed update testimonial.', error });
     }
   }
 
@@ -93,7 +93,7 @@ export class TestimonialController {
       res.status(500).send({ message: 'Failed to delete testimonial.', error });
     } 
   }
-}
+} 
 //  example post 
 // {
 //   "userId": 1,

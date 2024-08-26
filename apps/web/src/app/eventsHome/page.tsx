@@ -16,7 +16,7 @@ type Event = {
   startTime: string;
   endTime: string;
   isDeleted: boolean;
-};
+ } ;
 
 type Category = {
   id: number;
@@ -141,11 +141,11 @@ const CategoryList: React.FC = () => {
                             {event.title}
                           </h3>
                           {event.images.length > 0 && (
-                            <Image
-                              src={`${event.images[0].path}`}
+                            <Image 
+                              src={`http://localhost:8000${event.images[0].path} `}
                               alt={event.title}
-                              width={400}
-                              height={250}
+                              width={100}
+                              height={150}
                               className="rounded-md"
                             />
                           )}
@@ -158,7 +158,7 @@ const CategoryList: React.FC = () => {
                           <p
                             className={`text-${isEnded ? 'red' : isOngoing ? 'green' : 'gray'}-600 font-bold mt-2`}
                           >
-                            Status:{' '}
+                            Status 
                             {isEnded
                               ? 'Ended'
                               : isOngoing
@@ -166,7 +166,7 @@ const CategoryList: React.FC = () => {
                                 : 'Upcoming'}
                           </p>
                           <p className="text-gray-800">
-                            Ticket status: {event.ticketType}
+                            Ticket  {event.ticketType}
                           </p>
                           <p className="text-gray-800">
                             Seats Available: {event.totalSeats}
