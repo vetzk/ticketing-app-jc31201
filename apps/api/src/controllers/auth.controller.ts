@@ -101,6 +101,7 @@ export class AuthController {
             role: user.role,
             email: user.email,
             token: token,
+            refCode: user.referralCode,
           },
         });
       } else {
@@ -180,6 +181,7 @@ export class AuthController {
           result: {
             role: findUser.role,
             identificationId: findUser.identificationId,
+            refCode: findUser.referralCode,
             email: findUser.email,
             points: findUser.points,
             image: findProfile?.image,
@@ -215,6 +217,7 @@ export class AuthController {
           result: {
             email: findUser.email,
             identificationId: findUser.identificationId,
+            refCode: findUser.referralCode,
             role: findUser.role,
             points: findUser.points,
             image: findProfile?.image,

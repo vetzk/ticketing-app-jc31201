@@ -16,7 +16,7 @@ export default function EventList() {
   const [expandedEventId, setExpandedEventId] = useState<number | null>(null);
 
   return (
-    <div className="mt-8 flex justify-center items-center overflow-x-auto space-x-4 font-new-amsterdam">
+    <div className="mt-8 flex justify-center items-center overflow-x-auto space-x-4">
       {listEvents.map((event) => (
         <Event
           key={event.id}

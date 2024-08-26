@@ -40,6 +40,7 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
       setUser({
         email: data.result.email,
         identificationId: data.result.identificationId,
+        refCode: data.result.refCode,
         role: data.result.role,
         points: data.result.points,
         image: data.result.image,
@@ -71,7 +72,7 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
   }, [user]);
 
   return (
-    <div className="relative w-full h-screen flex justify-center items-center overflow-hidden p-10">
+    <div className="relative w-full h-screen flex justify-center items-center overflow-hidden p-10 lg:mb-0 mb-20">
       <Image
         src={'/events-background-1.jpg'}
         alt={'image'}

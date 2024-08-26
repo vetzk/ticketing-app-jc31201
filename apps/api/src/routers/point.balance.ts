@@ -1,5 +1,5 @@
-import { PointBalanceController } from '@/controllers/poin.balance';
-import { Router } from 'express' ; 
+import { PointBalanceController } from '../controllers/poin.balance';
+import { Router } from 'express';
 
 export class PointBalanceRouter {
   private router: Router;
@@ -10,10 +10,16 @@ export class PointBalanceRouter {
     this.pointBalanceController = new PointBalanceController();
     this.initializeRoutes();
   }
-  
+
   private initializeRoutes(): void {
-    this.router.put('/user/:userId/balance', this.pointBalanceController.updateBalance);
-    this.router.get('/user/:userId/balance', this.pointBalanceController.getBalance);
+    this.router.put(
+      '/user/:userId/balance',
+      this.pointBalanceController.updateBalance,
+    );
+    this.router.get(
+      '/user/:userId/balance',
+      this.pointBalanceController.getBalance,
+    );
   }
 
   public getRouter(): Router {

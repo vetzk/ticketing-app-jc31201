@@ -21,7 +21,7 @@ export default function Event({
       onClick={onClick}
     >
       <div className="justify-center items-center w-28 h-96 flex flex-shrink-0">
-        <h3 className="text-4xl transform -rotate-90">{title}</h3>
+        <h3 className="text-4xl transform lg:-rotate-90">{title}</h3>
       </div>
       {isExpanded && (
         <div className="flex-grow relative rounded-xl">

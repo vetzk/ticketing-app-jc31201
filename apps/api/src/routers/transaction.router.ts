@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { verifyToken } from '@/middleware/verifyToken';
+import { verifyToken } from '../middleware/verifyToken';
 import { TransactionController } from '../controllers/transaction.controller';
 
 export class TransactionRouter {

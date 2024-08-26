@@ -62,7 +62,7 @@ const Register: React.FunctionComponent<IRegisterProps> = (props) => {
   };
 
   return (
-    <div className="relative w-full h-screen flex justify-center items-center overflow-hidden p-10">
+    <div className="relative w-full h-screen flex justify-center items-center overflow-hidden p-10 lg:mb-0 mb-20">
       <Image
         src={'/events-background-1.jpg'}
         alt={'background image'}

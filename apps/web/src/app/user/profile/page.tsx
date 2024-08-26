@@ -38,6 +38,7 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
   const [phone, setPhone] = React.useState<string>('');
   const [gender, setGender] = React.useState<string>('MALE');
   const [location, setLocation] = React.useState<string>('');
+  const [refCode, setRefCode] = React.useState<string | undefined>('');
   const [date, setDate] = React.useState<Date | null>(new Date());
   const [isAdded, setIsAdded] = React.useState<boolean>(false);
   const [imageFile, setImageFile] = React.useState<File | null>(null);
@@ -95,6 +96,7 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
     mutation.mutate();
 
     setEmail(user?.email);
+    setRefCode(user?.refCode);
     console.log(email);
   }, []);
 
@@ -226,6 +228,11 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
               >
                 Delete
               </Button>
+            </div>
+          </div>
+          <div className="flex-col flex w-full h-auto gap-5">
+            <div className="w-full">
+              <p className="text-xl">Referral Code: {refCode}</p>
             </div>
           </div>
           <div className="flex-col flex w-full h-auto gap-5">

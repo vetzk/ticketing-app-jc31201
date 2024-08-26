@@ -70,27 +70,6 @@ const ProfileSidebar: React.FunctionComponent<IProfileSidebarProps> = (
             </div>
           </div>
         </div>
-        <div className="w-full">
-          <p className="text-2xl">System</p>
-        </div>
-        <div className="w-full flex-col flex gap-10">
-          <div className="w-full h-auto flex justify-start items-center gap-5">
-            <div className="w-10 h-10 rounded-xl bg-slate-400 flex justify-center items-center">
-              <IoMdNotificationsOutline size={30} color="white" />
-            </div>
-            <div>
-              <p className="text-xl">Notification</p>
-            </div>
-          </div>
-          <div className="w-full h-auto flex justify-start items-center gap-5">
-            <div className="w-10 h-10 rounded-xl bg-slate-400 flex justify-center items-center">
-              <MdOutlineRoomPreferences size={30} color="white" />
-            </div>
-            <div>
-              <p className="text-xl">Preferences</p>
-            </div>
-          </div>
-        </div>
       </div>
       {isSidebarOpen && (
         <div
