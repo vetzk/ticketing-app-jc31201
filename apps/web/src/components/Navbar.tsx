@@ -54,7 +54,7 @@ const menu = [
   },
   {
     title: 'Blog',
-    path: '/#',
+    path: '#',
     icon: <MdOutlineArticle />,
   },
 ];
@@ -133,7 +133,6 @@ export const Navbar = () => {
           )}
         </div>
 
-        {/* User Profile/Authentication Buttons */}
         {user?.email ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -176,7 +175,7 @@ export const Navbar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <div className="hidden lg:flex gap-3">
+          <div className="flex lg:flex gap-3">
             <Button
               onClick={() => router.replace('/login')}
               className="bg-slate-400 text-lg"

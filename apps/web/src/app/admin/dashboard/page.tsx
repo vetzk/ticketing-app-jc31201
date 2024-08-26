@@ -79,7 +79,7 @@ const AdminDashboard: React.FunctionComponent<IAdminDashboardProps> = () => {
   }));
 
   return (
-    <div className="flex flex-col lg:flex-row">
+    <div className="flex flex-col lg:flex-row mb-16">
       <AdminSidebar />
       <div className="flex-1 p-5 lg:ml-[30rem]">
         <div className="w-full h-auto grid grid-cols-1 lg:grid-cols-3 grid-rows-6 lg:grid-rows-2 gap-4 lg:gap-8">
