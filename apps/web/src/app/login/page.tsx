@@ -47,6 +47,8 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
       });
 
       router.replace('/');
+
+      router.replace('/');
     },
     onError: (error: any) => {
       setIsLoading(false);

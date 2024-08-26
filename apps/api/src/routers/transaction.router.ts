@@ -55,6 +55,48 @@ export class TransactionRouter {
       verifyToken,
       this.transactionController.getHistoryTransaction,
     );
+    this.router.post(
+      '/transaction',
+      this.transactionController.createTransaction,
+    );
+    this.router.get(
+      '/transaction/:id',
+      this.transactionController.readTransaction,
+    );
+    this.router.put(
+      '/transaction/:id',
+      this.transactionController.updateTransaction,
+    );
+    this.router.delete(
+      '/transaction/:id',
+      this.transactionController.deleteTransaction,
+    );
+    this.router.post(
+      '/event',
+      verifyToken,
+      this.transactionController.addTransaction,
+    );
+    this.router.patch(
+      '/pay',
+      verifyToken,
+      this.transactionController.payTransaction,
+    );
+    this.router.get('/event', this.transactionController.getTransaction);
+    this.router.patch(
+      '/point',
+      verifyToken,
+      this.transactionController.pointPrice,
+    );
+    this.router.patch(
+      '/discount',
+      verifyToken,
+      this.transactionController.discountPrice,
+    );
+    this.router.get(
+      '/history',
+      verifyToken,
+      this.transactionController.getHistoryTransaction,
+    );
   }
 
   public getRouter(): Router {
