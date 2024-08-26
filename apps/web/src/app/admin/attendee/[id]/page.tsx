@@ -45,26 +45,27 @@ const Attendee: React.FunctionComponent<IAttendeeProps> = ({ params }) => {
   };
 
   if (isLoading) {
-    <Loading duration={3000} />;
+    return <Loading duration={3000} />;
   }
+
   return (
     <div className="w-full flex flex-col gap-5 p-5">
       <div>
         <Button
-          className="bg-slate-500 text-xl p-5 text-white"
-          onClick={() => router.push('/admin/profile')}
+          className="bg-slate-500 text-xl p-3 text-white flex items-center"
+          onClick={() => router.push('/admin/list')}
         >
-          <FaArrowLeft size={30} className="" />
-          {'  '}Back to home
+          <FaArrowLeft size={20} className="mr-2" />
+          Back to list
         </Button>
       </div>
-      <p className="text-3xl">Attendance List</p>
+      <p className="text-2xl lg:text-3xl">Attendance List</p>
       <div className="w-full">
-        <div className="w-1/4 flex items-center gap-5">
+        <div className="flex flex-col lg:flex-row lg:w-1/4 gap-3 items-center">
           <Input
             type="text"
             className="text-lg"
-            placeholder="search ticket code"
+            placeholder="Search ticket code"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -73,17 +74,17 @@ const Attendee: React.FunctionComponent<IAttendeeProps> = ({ params }) => {
           </Button>
         </div>
       </div>
-      <div className="bg-slate-200 h-0.5 w-full"></div>
-      <div className="w-full flex flex-col text-xl">
-        <div className="w-full flex justify-between items-center text-2xl p-5 bg-slate-400 rounded-xl">
+      <div className="bg-slate-200 h-0.5 w-full mt-3"></div>
+      <div className="w-full flex flex-col text-xl mt-5">
+        <div className="w-full flex justify-between items-center text-lg lg:text-2xl p-3 lg:p-5 bg-slate-400 rounded-xl">
           <p>Ticket Code</p>
           <p>User</p>
           <p>Status</p>
         </div>
         {searchData.length > 0 ? (
           searchData.map((item, index) => (
-            <div key={index}>
-              <div className="w-full flex justify-between items-center text-xl p-5">
+            <div key={index} className="w-full">
+              <div className="w-full flex justify-between items-center text-lg lg:text-xl p-3 lg:p-5">
                 <p>{item.ticketCode}</p>
                 <p>
                   {data?.dataUser[0].user.userprofile[0]?.firstName
@@ -91,22 +92,20 @@ const Attendee: React.FunctionComponent<IAttendeeProps> = ({ params }) => {
                     : data.dataUser[0].user.email}
                 </p>
                 <div>
-                  {' '}
                   <Input
                     type="checkbox"
                     checked={item.status === 'USED'}
-                    className="h-6 w-6 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-5 w-5 lg:h-6 lg:w-6 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
                   />
                 </div>
               </div>
             </div>
           ))
         ) : (
-          <div className="text-2xl my-20 text-center justify-center items-center">
+          <div className="text-lg lg:text-2xl my-10 lg:my-20 text-center">
             No data found
           </div>
         )}
-        {/* {data?.result[0].status ? data.result[0].status : null} */}
       </div>
     </div>
   );

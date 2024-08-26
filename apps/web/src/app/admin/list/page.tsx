@@ -47,6 +47,8 @@ const EventList: React.FunctionComponent<IEventListProps> = (props) => {
         },
       });
       setMyEvent(data.result);
+      console.log(myEvent);
+
       return data.result;
     },
   });

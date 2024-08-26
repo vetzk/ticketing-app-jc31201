@@ -113,7 +113,7 @@ const EventMaker: React.FunctionComponent<IEventMakerProps> = (props) => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row">
+    <div className="flex flex-col lg:flex-row mb-16">
       {/* Sidebar */}
 
       <AdminSidebar />

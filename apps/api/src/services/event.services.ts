@@ -51,6 +51,7 @@ export class EventService {
     return await prisma.event.findMany({
       where: { userId },
       select: {
+        id: true,
         title: true,
         description: true,
         price: true,
