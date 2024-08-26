@@ -135,7 +135,7 @@ const Checkout: React.FunctionComponent<ICheckoutProps> = ({ params }) => {
     },
   });
 
-  React.useEffect(() => {}, [cart?.discountTotal, user?.points]);
+  React.useEffect(() => {}, [data?.discountTotal, user?.points]);
 
   const handlePayment = () => {
     payTransaction.mutate();
@@ -150,17 +150,17 @@ const Checkout: React.FunctionComponent<ICheckoutProps> = ({ params }) => {
   }
 
   return (
-    <div className="w-full flex justify-center items-center my-20">
+    <div className="w-full flex justify-center items-center my-10 px-4 lg:my-20 lg:px-0 mb-20">
       <ToastContainer />
-      <div className="w-1/2 flex flex-col gap-10 p-10 items-center min-h-screen  rounded-xl shadow-2xl">
+      <div className="w-full max-w-4xl flex flex-col gap-6 p-4 lg:p-10 items-center min-h-screen rounded-xl shadow-2xl">
         <div className="w-full">
-          <p className="text-4xl">Invoice #{params.orderCode}</p>
+          <p className="text-2xl lg:text-4xl">Invoice #{params.orderCode}</p>
         </div>
         <div className="w-full min-h-[40vh] relative">
           <Image
             src={
-              cart?.event.images.length
-                ? `http://localhost:8000${cart?.event.images[0].path}`
+              data?.event.images.length
+                ? `http://localhost:8000${data?.event.images[0].path}`
                 : `/blackpink.webp`
             }
             alt="image"
@@ -169,49 +169,47 @@ const Checkout: React.FunctionComponent<ICheckoutProps> = ({ params }) => {
             className="rounded-xl"
           />
         </div>
-        <div className="w-full text-xl">
-          <p className="text-3xl">
-            {cart?.qty}X {cart?.event.title}
+        <div className="w-full text-lg lg:text-xl">
+          <p className="text-xl lg:text-3xl">
+            {data?.qty}X {data?.event.title}
           </p>
-          <span className="text-2xl">
-            {cart &&
-              cart.event &&
-              cart.event.price !== undefined &&
+          <span className="text-lg font-bold lg:text-2xl">
+            {data?.event.price &&
               new Intl.NumberFormat('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
-              }).format(cart.event.price)}
+              }).format(data.discountTotal)}
           </span>
         </div>
-        <div className="w-full flex flex-col gap-5">
-          <Label className="text-xl">Add your discount code</Label>
+        <div className="w-full flex flex-col gap-4 lg:gap-5">
+          <Label className="text-lg lg:text-xl">Add your discount code</Label>
           <Input
             type="text"
-            className="text-xl"
+            className="text-lg lg:text-xl"
             placeholder="Discount Code (optional)"
             onChange={(e) => setDiscount(e.target.value)}
           />
           <Button
             onClick={handleVoucher}
             disabled={data?.status === 'PAID'}
-            className="w-full bg-slate-400 text-xl text-white"
+            className="w-full bg-slate-400 text-lg lg:text-xl text-white"
           >
             Add Discount Code
           </Button>
         </div>
         <div className="w-full">
-          <p className="text-xl">
+          <p className="text-lg lg:text-xl">
             {user?.points && user?.points > 0
               ? `You have ${user?.points} points want to apply?`
-              : 'You dont have any point'}
+              : 'You don’t have any points'}
           </p>
-          <div className="w-full flex gap-5">
+          <div className="w-full flex gap-4 lg:gap-5">
             {user?.points && user?.points > 0 ? (
               <React.Fragment>
                 <Button
                   disabled={data?.status === 'PAID'}
                   onClick={handlePoints}
-                  className="bg-slate-500 p-5 text-xl"
+                  className="bg-slate-500 p-3 lg:p-5 text-lg lg:text-xl"
                 >
                   Use
                 </Button>
@@ -219,42 +217,41 @@ const Checkout: React.FunctionComponent<ICheckoutProps> = ({ params }) => {
             ) : null}
           </div>
         </div>
-        <div className="w-full flex justify-between">
+        <div className="w-full flex justify-between text-sm lg:text-xl">
           <div>
-            <p className="text-2xl">Subtotal</p>
+            <p>Subtotal</p>
           </div>
           <div>
-            <p className="text-2xl">
-              {cart &&
-                cart.total !== undefined &&
+            <p>
+              {data?.total &&
                 new Intl.NumberFormat('id-ID', {
                   style: 'currency',
                   currency: 'IDR',
-                }).format(cart.total)}
+                }).format(data.total)}
             </p>
           </div>
         </div>
         <div className="h-0.5 w-full bg-slate-300"></div>
-        <div className="w-full flex justify-between">
+        <div className="w-full flex justify-between text-sm lg:text-xl">
           <div>
-            <p className="text-2xl">Total</p>
+            <p>Total</p>
           </div>
           <div>
-            {discount && cart && cart?.total !== undefined && (
-              <span className="text-2xl line-through">
+            {discount && data?.total && (
+              <span className="line-through">
                 {new Intl.NumberFormat('id-ID', {
                   style: 'currency',
                   currency: 'IDR',
-                }).format(cart.total)}
+                }).format(data.total)}
               </span>
             )}
-            <p className="text-2xl">
-              {cart &&
-                cart.discountTotal &&
+            <p>
+              {data &&
+                data.discountTotal &&
                 new Intl.NumberFormat('id-ID', {
                   style: 'currency',
                   currency: 'IDR',
-                }).format(cart.discountTotal)}
+                }).format(data.discountTotal)}
             </p>
           </div>
         </div>
@@ -262,7 +259,7 @@ const Checkout: React.FunctionComponent<ICheckoutProps> = ({ params }) => {
           <Button
             onClick={handlePayment}
             disabled={data?.status === 'PAID'}
-            className="bg-slate-400 w-full text-xl text-white"
+            className="bg-slate-400 w-full text-lg lg:text-xl text-white"
           >
             Pay Now
           </Button>

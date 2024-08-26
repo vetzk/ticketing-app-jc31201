@@ -17,4 +17,12 @@ describe('Test auth user', () => {
     });
     expect(response.body).toHaveProperty('success', true);
   });
+  it('return success login', async () => {
+    const response = await request(app).post('/api/auth/register').send({
+      email: 'mulyono@mail.com',
+      password: 'Admin12345.',
+      confirmPassword: 'Admin12345.',
+    });
+    expect(response.body).toHaveProperty('success', true);
+  });
 });

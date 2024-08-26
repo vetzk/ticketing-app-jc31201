@@ -2,6 +2,7 @@ export type UserType = {
   email: string;
   role: string;
   identificationId: string;
+  refCode: string;
   points: number;
   image: string;
 };

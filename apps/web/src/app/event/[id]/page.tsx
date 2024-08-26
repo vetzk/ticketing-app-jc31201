@@ -108,35 +108,34 @@ const EventDetails: React.FunctionComponent<IEventDetailsProps> = ({
     return <p>Failed to load event details.</p>;
   }
   return (
-    <div className="w-full h-auto flex flex-col justify-center items-center">
+    <div className="w-full h-auto flex flex-col justify-center items-center mb-16">
       <ToastContainer />
-      <div className="w-[80%] flex  p-10 gap-10 mt-10">
-        <div className="w-[60%] flex flex-col gap-10">
-          <div className="w-full min-h-[50vh] relative">
+      <div className="w-[90%] lg:w-[80%] flex flex-col lg:flex-row p-5 lg:p-10 gap-5 lg:gap-10 mt-5 lg:mt-10">
+        <div className="w-full lg:w-[60%] flex flex-col gap-5 lg:gap-10">
+          <div className="w-full min-h-[40vh] relative">
             <Image
               src={
                 data.images.length > 0
                   ? `http://localhost:8000${data.images[currentIndex].path}`
                   : '/blackpink.webp'
               }
-              layout="fill"
+              fill
               alt={`image-${currentIndex}`}
-              objectFit="cover"
-              className="rounded-xl"
+              className="rounded-xl object-cover"
             />
           </div>
           <div className="flex justify-between mt-4">
             <Button
               disabled={data.images.length <= 1}
               onClick={prevImage}
-              className="bg-gray-300 text-gray-800 px-4 py-2 rounded-xl"
+              className="bg-gray-300 text-gray-800 px-3 lg:px-4 py-1 lg:py-2 rounded-xl"
             >
               Previous
             </Button>
             <Button
               onClick={nextImage}
               disabled={data.images.length <= 1}
-              className="bg-gray-300 text-gray-800 px-4 py-2 rounded-xl"
+              className="bg-gray-300 text-gray-800 px-3 lg:px-4 py-1 lg:py-2 rounded-xl"
             >
               Next
             </Button>
@@ -145,13 +144,13 @@ const EventDetails: React.FunctionComponent<IEventDetailsProps> = ({
             className={
               data.images.length <= 1
                 ? 'hidden'
-                : 'flex justify-center gap-4 mt-6'
+                : 'flex justify-center gap-2 lg:gap-4 mt-4 lg:mt-6'
             }
           >
             {data.images.map((img: any, index: number) => (
               <div
                 key={index}
-                className={`relative w-20 h-20 cursor-pointer border-2 ${
+                className={`relative w-16 h-16 lg:w-20 lg:h-20 cursor-pointer border-2 ${
                   currentIndex === index
                     ? 'border-slate-500'
                     : 'border-transparent'
@@ -160,21 +159,20 @@ const EventDetails: React.FunctionComponent<IEventDetailsProps> = ({
               >
                 <Image
                   src={`http://localhost:8000${img.path}`}
-                  layout="fill"
+                  fill
                   alt={`preview-${index}`}
-                  objectFit="cover"
+                  className="object-cover"
                 />
               </div>
             ))}
           </div>
         </div>
-        <div className="flex-1 flex flex-col gap-5 text-xl shadow-2xl rounded-xl p-10">
-          <p className="text-3xl">{data.title}</p>
-          <div className="flex items-center gap-5">
-            <CiCalendarDate size={30} />
+        <div className="flex-1 flex flex-col gap-5 lg:gap-10 text-lg lg:text-xl shadow-2xl rounded-xl p-5 lg:p-10">
+          <p className="text-2xl lg:text-3xl">{data.title}</p>
+          <div className="flex items-center gap-3 lg:gap-5">
+            <CiCalendarDate className="text-xl lg:text-2xl" />
             <p>
-              {new Date(data.startTime).getDate()}
-              {'-'}
+              {new Date(data.startTime).getDate()}-
               {new Date(data.endTime).toLocaleDateString('en-GB', {
                 day: 'numeric',
                 month: 'long',
@@ -182,16 +180,16 @@ const EventDetails: React.FunctionComponent<IEventDetailsProps> = ({
               })}
             </p>
           </div>
-          <div className="flex items-center gap-5">
-            <CiClock1 size={30} />
+          <div className="flex items-center gap-3 lg:gap-5">
+            <CiClock1 className="text-xl lg:text-2xl" />
             <p>07.00 - 18.00</p>
           </div>
-          <div className="flex items-center gap-5">
-            <FiMapPin size={30} />
+          <div className="flex items-center gap-3 lg:gap-5">
+            <FiMapPin className="text-xl lg:text-2xl" />
             <p>{data.location.locationName}</p>
           </div>
-          <div className="flex items-center gap-5">
-            <MdOutlinePriceChange size={30} />
+          <div className="flex items-center gap-3 lg:gap-5">
+            <MdOutlinePriceChange className="text-xl lg:text-2xl" />
             <p>
               {new Intl.NumberFormat('id-ID', {
                 style: 'currency',
@@ -199,7 +197,7 @@ const EventDetails: React.FunctionComponent<IEventDetailsProps> = ({
               }).format(data.price)}
             </p>
           </div>
-          <div className="h-0.5 w-full bg-slate-200 mt-16"></div>
+          <div className="h-0.5 w-full bg-slate-200 mt-10 lg:mt-16"></div>
           <div>
             <p>Organized By</p>
             <p className="font-bold">
@@ -209,27 +207,28 @@ const EventDetails: React.FunctionComponent<IEventDetailsProps> = ({
           </div>
         </div>
       </div>
-      <div className="w-[80%] flex p-10 gap-10 mt-10">
-        <div className="w-[60%] flex flex-col gap-10 ">
-          <div className="w-full min-h-[50vh] flex flex-col gap-10">
+      <div className="w-[90%] lg:w-[80%] flex flex-col lg:flex-row p-5 lg:p-10 gap-5 lg:gap-10">
+        <div className="w-full lg:w-[60%] flex flex-col gap-5 lg:gap-10">
+          <div className="w-full min-h-[50vh] flex flex-col gap-5 lg:gap-5">
             <div>
-              <p className="text-xl">{data.description}</p>
+              <p className="text-base lg:text-xl">{data.description}</p>
             </div>
             <div>
-              <h1 className="text-4xl mb-10">
-                <strong>Terms and Conditions</strong>
+              <h1 className="text-2xl lg:text-4xl mb-5 lg:mb-10 font-bold">
+                Terms and Conditions
               </h1>
-              <p className="text-xl">
+              <p className="text-base lg:text-xl">
                 Welcome to Eventgarde! These terms and conditions outline the
                 rules and regulations for the use of our website and the
                 services we provide. By accessing or using our website, you
                 agree to be bound by these terms. If you do not agree with these
-                terms, please do not use our website. <br />
+                terms, please do not use our website.
+                <br />
               </p>
-              <h1 className="text-2xl my-10">
-                <strong>1. Introduction</strong>{' '}
+              <h1 className="text-lg lg:text-2xl my-5 lg:my-10 font-bold">
+                1. Introduction
               </h1>
-              <p className="text-xl">
+              <p className="text-base lg:text-xl">
                 These Terms and Conditions govern your use of our website
                 located at [website URL] and our services related to event
                 ticketing, registration, and information. The term “we,” “us,”
@@ -331,7 +330,7 @@ const EventDetails: React.FunctionComponent<IEventDetailsProps> = ({
           </div>
         </div>
         <div className="flex-1">
-          <div className="sticky top-40 flex flex-col gap-5 text-xl ">
+          <div className="sticky top-40 flex flex-col gap-5 text-xl">
             <div className="w-full rounded-xl shadow-2xl p-5">
               {!showQuantity ? (
                 <Button
