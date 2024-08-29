@@ -1,4 +1,3 @@
-import apiCall from '@/helper/axiosInstance';
 import { createSlice } from '@reduxjs/toolkit';
 
 type User = {
