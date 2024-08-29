@@ -13,6 +13,8 @@ import { useRouter } from 'next/navigation';
 import { ClipLoader } from 'react-spinners';
 import { UserContext } from '@/contexts/UserContext';
 import withAuth from '@/hoc/authGuard';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface ILoginProps {}
 
@@ -52,16 +54,9 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
     },
     onError: (error: any) => {
       setIsLoading(false);
-      toast(error.response.data.message);
-      if (
-        error.response &&
-        error.response.data &&
-        Array.isArray(error.response.data.error.errors)
-      ) {
-        error.response.data.error.errors.forEach((err: any) => {
-          toast(err.msg);
-        });
-      }
+      console.log(error);
+
+      toast(error.response.data.error.errors[0].msg);
     },
   });
 
@@ -82,7 +77,7 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
         objectFit="cover"
         className="absolute inset-0 -z-10"
       />
-      <div className="w-full max-w-sm rounded-xl shadow-2xl p-5 h-auto bg-slate-200 bg-opacity-75 flex flex-col justify-center items-center gap-5 z-10">
+      <div className="w-full max-w-sm rounded-xl shadow-2xl p-5 h-auto bg-slate-200 bg-opacity-75 flex flex-col justify-center items-center gap-5 z-40">
         <ToastContainer />
         <div className="w-full h-auto flex flex-col justify-center items-center gap-3">
           <p className="font-bold text-3xl text-center">Login Event</p>
@@ -91,14 +86,14 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
           </p>
         </div>
         <div className="w-full h-auto justify-center items-center flex flex-col gap-3">
-          <button className="w-full p-3 bg-red-600 text-white rounded-xl shadow-2xl flex justify-center items-center gap-2 font-bold">
+          <Button className="w-full p-3 bg-red-600 text-white rounded-xl shadow-2xl flex justify-center items-center gap-2 font-bold">
             <FaGoogle size={20} />
             Login with Google
-          </button>
-          <button className="w-full p-3 bg-blue-600 text-white rounded-xl shadow-2xl flex justify-center items-center gap-2 font-bold">
+          </Button>
+          <Button className="w-full p-3 bg-blue-600 text-white rounded-xl shadow-2xl flex justify-center items-center gap-2 font-bold">
             <FaFacebookF size={20} />
             Login with Facebook
-          </button>
+          </Button>
         </div>
         <div className="w-full flex items-center justify-center my-4">
           <div className="w-full h-px bg-gray-400" />
@@ -110,7 +105,7 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
             size={30}
             className="absolute left-2 top-1/2 transform -translate-y-1/2"
           />
-          <input
+          <Input
             type="email"
             className="w-full h-auto p-3 pl-14 rounded-xl shadow-2xl"
             placeholder="Email"
@@ -122,18 +117,18 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
             size={30}
             className="absolute left-2 top-1/2 transform -translate-y-1/2"
           />
-          <input
+          <Input
             type={isVisible ? 'text' : 'password'}
             className="w-full h-auto p-3 pl-14 rounded-xl shadow-2xl"
             placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}
           />
-          <button
+          <Button
             onClick={() => setIsVisible(!isVisible)}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2"
+            className="absolute right-1 top-1/2 transform -translate-y-1/2"
           >
             {isVisible ? <FaEyeSlash size={30} /> : <FaEye size={30} />}
-          </button>
+          </Button>
         </div>
         <div className="w-full h-auto flex justify-end items-center">
           <p className="text-lg">
@@ -141,13 +136,13 @@ const Login: React.FunctionComponent<ILoginProps> = (props) => {
           </p>
         </div>
         <div className="w-full h-auto flex justify-center items-center">
-          <button
+          <Button
             onClick={handleLogin}
             disabled={isLoading}
             className="w-full p-3 bg-slate-500 rounded-xl shadow-2xl shadow-slate-400 font-bold text-white"
           >
             {isLoading ? <ClipLoader size={30} color="white" /> : 'LOGIN'}
-          </button>
+          </Button>
         </div>
         <div className="w-full h-auto flex justify-center items-center text-white">
           <p>

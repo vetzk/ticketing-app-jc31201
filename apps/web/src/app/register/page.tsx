@@ -53,7 +53,7 @@ const Register: React.FunctionComponent<IRegisterProps> = (props) => {
     },
     onError: (error: any) => {
       console.log(error);
-      toast(error.response.data.message);
+      toast(error.response.data.error.errors[0].msg);
     },
   });
 
@@ -70,7 +70,7 @@ const Register: React.FunctionComponent<IRegisterProps> = (props) => {
         objectFit="cover"
         className="absolute inset-0 -z-10"
       />
-      <div className="w-full max-w-sm rounded-xl shadow-2xl p-5 bg-slate-200 bg-opacity-70 flex flex-col justify-center items-center gap-5 z-10">
+      <div className="w-full max-w-sm rounded-xl shadow-2xl p-5 bg-slate-200 bg-opacity-70 flex flex-col justify-center items-center gap-5 z-40">
         <ToastContainer />
         <div className="w-full flex flex-col justify-center items-center gap-3 text-center">
           <p className="font-bold text-2xl md:text-3xl">Register Event</p>

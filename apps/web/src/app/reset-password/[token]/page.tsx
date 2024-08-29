@@ -2,10 +2,11 @@
 
 import apiCall from '@/helper/apiCall';
 import { useMutation } from '@tanstack/react-query';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { RiLockPasswordLine } from 'react-icons/ri';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Image from 'next/image';
 import { FaEyeSlash, FaEye } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
@@ -15,8 +16,8 @@ interface IResetPassProps {}
 
 const ResetPass: React.FunctionComponent<IResetPassProps> = (props) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get('token');
+  const { token } = useParams();
+  // const token = searchParams.get('token');
   const [password, setPassword] = React.useState<string>('');
   const [confirmPassword, setConfirmPassword] = React.useState<string>('');
   const [isVisible, setIsVisible] = React.useState<boolean>(false);
@@ -45,6 +46,7 @@ const ResetPass: React.FunctionComponent<IResetPassProps> = (props) => {
     },
     onError: (error: any) => {
       console.log(error);
+      toast(error.response.data.error.errors[0].msg);
     },
   });
 

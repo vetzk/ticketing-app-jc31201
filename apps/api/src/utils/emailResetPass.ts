@@ -6,8 +6,8 @@ import fs from 'fs';
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
-    user: process.env.EMAIL_SENDER,
-    pass: process.env.PASS_EMAILER,
+    user: process.env.MAILER,
+    pass: process.env.PASS_MAILER,
   },
 });
 
@@ -18,7 +18,7 @@ export const sendEmail = async (
   data?: { email: string; token: string },
 ) => {
   try {
-    const urlLink = `http://localhost:3000/reset-password?token=${data?.token}`;
+    const urlLink = `http://localhost:3000/reset-password/${data?.token}`;
     const templatePath = path.join(__dirname, '../templates', 'resetPass.hbs');
     const templateSource = fs.readFileSync(templatePath, 'utf-8');
     const compileTemplates = handlebars.compile(templateSource);

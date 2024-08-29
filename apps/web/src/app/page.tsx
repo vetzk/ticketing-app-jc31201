@@ -1,6 +1,5 @@
 'use client';
 import Image from 'next/image';
-import styles from './page.module.css';
 import withAuth from '@/hoc/authGuard';
 import { MdNavigateNext, MdNavigateBefore } from 'react-icons/md';
 import { useState, useEffect } from 'react';

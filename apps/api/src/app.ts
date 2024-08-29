@@ -14,10 +14,6 @@ import { AuthRouter } from './routers/auth.router';
 import { ProfileRouter } from './routers/profile.router';
 import { EventRouter } from './routers/event.router';
 import { TransactionRouter } from './routers/transaction.router';
-import { TestimonialRouter } from './routers/testimonial.router';
-import { DiscountRouter } from './routers/discount.route';
-import { PromotionRouter } from './routers/promotion.router';
-import { PointBalanceRouter } from './routers/point.balance';
 import path from 'path';
 import { VoucherRouter } from './routers/voucher.router';
 
@@ -68,11 +64,6 @@ export default class App {
     const profileRouter = new ProfileRouter();
     const eventRouter = new EventRouter();
     const transactionRouter = new TransactionRouter();
-    const testimonialRouter = new TestimonialRouter();
-    const discountRouter = new DiscountRouter();
-    const balancePointRouter = new PointBalanceRouter();
-    const promotionRouter = new PromotionRouter();
-    const voucherRouter = new VoucherRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -82,11 +73,6 @@ export default class App {
     this.app.use('/api/user', profileRouter.getRouter());
     this.app.use('/api/admin', eventRouter.getRouter());
     this.app.use('/api/transaction', transactionRouter.getRouter());
-    this.app.use('/api/testimonial', testimonialRouter.getRouter());
-    this.app.use('/api/discount', discountRouter.getRouter());
-    this.app.use('/api/balance-point', balancePointRouter.getRouter());
-    this.app.use('/api/promotion', promotionRouter.getRouter());
-    this.app.use('/api/discount', voucherRouter.getRoute());
   }
 
   public start(): void {
